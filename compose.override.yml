@@ -1,0 +1,15 @@
+services:
+  risk-governance:
+    environment:
+      WORKBENCH_DEMO_ENABLED: "true"
+      SERVER_ADDRESS: 0.0.0.0
+      DB_URL: jdbc:oracle:thin:@oracle:1521/FREEPDB1
+      DB_USER: ${DB_USER:-user}
+      DB_PASSWORD: ${DB_PASSWORD:-vikas123}
+    depends_on:
+      oracle:
+        condition: service_healthy
+  gateway:
+    environment:
+      RISK_GOVERNANCE_URL: http://risk-governance:8084
+

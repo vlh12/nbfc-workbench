@@ -1,0 +1,6 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: 8083
+spring:
+  application:
+    name: stress-simulation

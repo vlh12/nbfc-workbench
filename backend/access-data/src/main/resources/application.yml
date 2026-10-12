@@ -1,0 +1,45 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: 8081
+
+
+spring:
+  application:
+    name: project-2
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/freepdb1
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: system
+    password: vikas123
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    table: access_data_flyway_history
+    baseline-on-migrate: true
+    baseline-version: "0"
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        max.request.size: 12582912
+    consumer:
+      group-id: access-data-v1
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        max.partition.fetch.bytes: 12582912
+    listener:
+      ack-mode: record
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+

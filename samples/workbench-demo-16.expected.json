@@ -1,0 +1,35 @@
+{
+  "syntheticOnly": true,
+  "currency": "INR",
+  "records": 16,
+  "banks": 4,
+  "nbfcs": 4,
+  "totalExposure": "9600000.30",
+  "nbfcTotals": [
+    {
+      "nbfcId": "SYN-NBFC-001",
+      "amount": "3400000.00",
+      "records": 4
+    },
+    {
+      "nbfcId": "SYN-NBFC-002",
+      "amount": "2700000.00",
+      "records": 4
+    },
+    {
+      "nbfcId": "SYN-NBFC-003",
+      "amount": "2350000.00",
+      "records": 4
+    },
+    {
+      "nbfcId": "SYN-NBFC-004",
+      "amount": "1150000.30",
+      "records": 4
+    }
+  ],
+  "assumptions": [
+    "These are expected totals for this file alone; existing uploads add to them.",
+    "The current UI implements total exposure, NBFC count, record count and per-NBFC sums.",
+    "Stress results, regulatory ratios, risk thresholds and approvals are not implemented."
+  ]
+}

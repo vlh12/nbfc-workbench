@@ -1,0 +1,79 @@
+{
+  "project": "NBFC Exposure Stress & Alert Workbench",
+  "releaseStatus": "not-ready-for-client-delivery",
+  "dataPolicy": "synthetic-only",
+  "requirementsSources": {
+    "architectureDiagram": "provided",
+    "phase0Proposal": "not-accessible",
+    "clientQuestionsAndAnswers": "not-accessible",
+    "agreedWorkflowDefinitions": "not-accessible"
+  },
+  "features": [
+    {
+      "name": "CSV ingestion and validation",
+      "status": "implemented-source-unverified"
+    },
+    {
+      "name": "Exposure summaries and charts",
+      "status": "implemented-source-unverified"
+    },
+    {
+      "name": "Kafka outbox and duplicate-event protection",
+      "status": "implemented-source-unverified"
+    },
+    {
+      "name": "Exposure explorer, filters and drill-down",
+      "status": "pending"
+    },
+    {
+      "name": "Concentration metrics and NBFC risk indicators",
+      "status": "pending-agreed-calculation-rules"
+    },
+    {
+      "name": "Stress scenarios, loss calculation and capital impact",
+      "status": "pending-agreed-calculation-rules"
+    },
+    {
+      "name": "Alert thresholds and explanations",
+      "status": "pending-agreed-thresholds"
+    },
+    {
+      "name": "Analyst assessment submission",
+      "status": "pending-agreed-workflow"
+    },
+    {
+      "name": "Supervisor return and approval workflow",
+      "status": "pending-agreed-workflow"
+    },
+    {
+      "name": "Follow-up actions and audit screens",
+      "status": "pending"
+    },
+    {
+      "name": "Real authentication and per-user ownership",
+      "status": "pending-user-preference",
+      "note": "Keycloak removed at user request; selectable demo roles are not authentication."
+    },
+    {
+      "name": "Dataset approval",
+      "status": "proposed-in-HLD-needs-confirmation"
+    }
+  ],
+  "requiredBeforeRelease": [
+    "Inspect actual current source and requirements documents.",
+    "Approve calculation definitions, input units, rounding, scenario versioning and expected results.",
+    "Approve role permissions and assessment/approval state transitions.",
+    "Implement the missing features against those rules.",
+    "Run backend unit tests, database integration checks, frontend type checking and production build.",
+    "Verify login, uploads, scenarios, alerts, decisions, audit history and restart persistence end to end.",
+    "Validate expected results with deterministic synthetic fixtures.",
+    "Deliver runbook, known limitations and client acceptance evidence."
+  ],
+  "verification": {
+    "build": "not-run",
+    "tests": "not-run",
+    "oracleConnection": "not-verified",
+    "browserWorkflow": "not-verified",
+    "environmentBlocker": "Host execution and Node runtime fail with helper_unknown_error."
+  }
+}

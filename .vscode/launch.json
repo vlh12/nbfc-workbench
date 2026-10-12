@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Access & Data",
+      "request": "launch",
+      "mainClass": "com.nbfc.accessdata.Application",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "WORKBENCH_DEMO_ENABLED": "true",
+        "SERVER_ADDRESS": "127.0.0.1",
+        "SERVER_PORT": "8081",
+        "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
+        "DB_USER": "user",
+        "DB_PASSWORD": "vikas123",
+        "KAFKA_BOOTSTRAP": "localhost:9092"
+      }
+    },
+    {
+      "type": "java",
+      "name": "Exposure Analytics",
+      "request": "launch",
+      "mainClass": "com.nbfc.exposureanalytics.Application",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "WORKBENCH_DEMO_ENABLED": "true",
+        "SERVER_ADDRESS": "127.0.0.1",
+        "SERVER_PORT": "8082",
+        "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
+        "DB_USER": "user",
+        "DB_PASSWORD": "vikas123",
+        "KAFKA_BOOTSTRAP": "localhost:9092"
+      }
+    },
+    {
+      "type": "java",
+      "name": "API Gateway",
+      "request": "launch",
+      "mainClass": "com.nbfc.gateway.Application",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "WORKBENCH_DEMO_ENABLED": "true",
+        "SERVER_ADDRESS": "127.0.0.1",
+        "SERVER_PORT": "8090"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Upload-to-dashboard backend",
+      "configurations": ["Access & Data", "Exposure Analytics", "API Gateway"],
+      "stopAll": true
+    }
+  ]
+}
