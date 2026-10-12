@@ -1,5 +1,5 @@
 # Oracle Database configuration
-
+Example 
 The intended native development database is Oracle Free/AI Database with the `FREEPDB1` pluggable database.
 
 ~~~ eg text
