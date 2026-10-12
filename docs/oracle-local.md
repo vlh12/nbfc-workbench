@@ -2,7 +2,7 @@
 
 The intended native development database is Oracle Free/AI Database with the `FREEPDB1` pluggable database.
 
-~~~text
+~~~ eg text
 URL:      jdbc:oracle:thin:@//localhost:1521/FREEPDB1
 Username: user
 Password: vikas123
