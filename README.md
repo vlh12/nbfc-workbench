@@ -1,45 +1,298 @@
 # NBFC Exposure Stress & Alert Workbench
 
-## Approved technical direction
+Synthetic-data prototype for collecting bank-to-NBFC lending reports and reviewing saved loan figures.
 
-- Frontend: React 19, TypeScript, Vite, Tailwind CSS, shadcn/ui, Recharts.
-- Backend: Java 21, compatible Spring Boot and Spring Cloud Gateway, Maven.
-- Local synthetic demo roles with Spring Security endpoint rules. No real login or identity provider.
-- Events: Apache Kafka.
-- Persistence: Oracle AI Database 26ai, Spring Data JPA, Oracle JDBC.
-- Migrations: Flyway, pending selected-version compatibility and licensing verification.
-- Local infrastructure: Docker Compose.
-- Verification: JUnit, Mockito, Testcontainers.
+## Current handover
 
-Exact dependency versions remain to be selected and verified.
+Branch: `feature/saved-report-review`
 
-## Approved service boundaries
+Working flow:
 
-1. Access & Data: logically separate access and data modules; ingestion, validation, corrections and batch tracking.
-2. Exposure Analytics: consolidated exposures, concentration calculations, risk indicators and dashboard data.
-3. Stress Simulation: scenario versions, stressed losses, capital impact and completion events.
-4. Risk Governance: thresholds, alerts, assessments, supervisor decisions, follow-up actions and audit history.
+Contributor selects bank reference → uploads CSV → validates → explicitly saves report → Analyst or Supervisor selects the saved report → views saved figures and loan graphs.
 
-The gateway and identity provider are supporting infrastructure.
+Company revenue appears as an exact amount with its start/end period. The current implementation has no revenue chart or growth calculation.
 
-## Requirements status
+## Implemented features
 
-The supplied architecture diagram is an available reference. The Phase 0 proposal, client Q&A and agreed workflows have not yet been inspected. Do not invent formulas, thresholds, upload fields, permissions or approval transitions. Supervisor dataset approval is marked proposed in the diagram and remains unresolved.
+### Contributor
 
-## Delivery constraints
+- View independently stored bank reference loans and company revenue records.
+- Upload one NBFC's complete loan set for a selected reporting date.
+- Validate loan figures, reporting date, revenue period and revenue amount.
+- Reject incorrect values, missing loans and duplicate loans with correction messages.
+- Explicitly save a successfully validated report.
+- Revalidate the uploaded file on the server before saving.
+- Save the report and its loan rows in one transaction.
+- Show the new Report ID and prevent another save of the current upload.
+- Refresh saved report history automatically.
+- Open saved reports and inspect their saved figures.
 
-Use synthetic data only. Keep synced files under the parent project's sources directory read-only. The user has authorized building the upload-to-dashboard slice. Further business workflows require source-document review and step-by-step discussion.
+### Analyst and Supervisor
 
-## First slice source
+- Browse saved validated reports for the current demo bank.
+- Navigate a paginated report list.
+- Select one saved Report ID and view its details.
+- Display a grouped loan bar chart with checkbox controls for amount lent, recorded interest, total payable, amount repaid and outstanding amount.
+- Show exact rupee amounts in tooltips and the supporting table.
+- Display company revenue once for the selected report.
+- Handle loading, empty and error states.
 
-Implemented source covers selectable synthetic demo roles, strict CSV validation, batch and durable outbox persistence, Kafka delivery, idempotent analytics projection and a role-protected exposure summary. Stress Simulation and Risk Governance contain service scaffolds only.
+## Technology versions
 
-The user requested removal of Keycloak. Use [the current local demo instructions](docs/local-demo.md). Demo roles are freely selectable and do not provide authentication.
+Preserve the versions declared in the existing Maven and frontend package files.
 
-See [local run instructions](docs/runbook.md), [architecture](docs/architecture.md) and [requirements status](docs/requirements-status.md).
+| Component | Version |
+|---|---|
+| Java | 21 |
+| Spring Boot | 3.5.7 |
+| Spring Cloud | 2025.0.0 |
+| React | 19.1.1 |
+| TypeScript | 5.9.2 |
+| Vite | 7.1.7 |
+| Tailwind CSS | 4.1.13 |
+| Recharts | 3.2.1 |
+| Database | Oracle Database 26ai Free |
+| Backend build | Maven |
+| Frontend package manager | npm |
 
-## Verification
+Use a Node.js version compatible with Vite 7: Node 20.19+ within the 20.x line, or Node 22.12+.
 
-For the user's existing native Oracle account, see [local Oracle settings](docs/oracle-local.md). Both local services now use the user-supplied account, with separate migration history tables.
+The local development environment uses Windows 11, Spring Tool Suite and SQL Developer.
 
-Builds and tests have not run because the host shell and Node runtime fail to start. Git initialization is pending. Dependency versions, container startup and the complete browser workflow still need execution checks. Do not treat this source as a verified release.
+## Service boundaries
+
+| Service | Port | Responsibility |
+|---|---:|---|
+| Access & Data | 8081 | Bank references, report validation, saved reports and reviewer reads |
+| Exposure Analytics | 8082 | Separate older batch/Kafka exposure projection |
+| Stress Simulation | 8083 | Existing boundary for future stress functionality |
+| Risk Governance | 8084 | Separate governance prototype |
+| Gateway | 8090 | Routes API requests to the owning service |
+| Frontend | 5173 | React application |
+
+The saved-report feature requires Oracle, Access & Data, Gateway and the frontend.
+
+Kafka can remain stopped for this feature. The older `/api/batches` and exposure projection flow remains separate.
+
+Existing exposure/governance panels may show unavailable messages when their services are stopped. Use the **Saved lending reports** section to review the current feature.
+
+## Get the code
+
+After the handover branch has been pushed:
+
+```cmd
+git clone --branch feature/saved-report-review https://github.com/vlh12/nbfc-workbench.git
+cd nbfc-workbench
+```
+
+For an existing clone without a local copy of this branch, first finish or preserve any local work, then run:
+
+```cmd
+git fetch origin
+git switch -c feature/saved-report-review --track origin/feature/saved-report-review
+```
+
+## Local setup
+
+### 1. Prepare prerequisites
+
+Install or configure:
+
+- Java 21 and Maven.
+- Compatible Node.js and npm.
+- Spring Tool Suite.
+- A running Oracle Database instance and listener.
+- An application schema with the privileges and tablespace quota needed by Flyway.
+- SQL Developer for inspecting the database.
+
+SQL Developer is a database client. Opening it does not start Oracle.
+
+### 2. Import the backend into STS
+
+1. Choose **File → Import → Maven → Existing Maven Projects**.
+2. Select the repository root containing the parent `pom.xml`.
+3. Import the Maven modules.
+4. Configure Java 21 for the projects and run configurations.
+
+Run existing backend checks from the repository root:
+
+```cmd
+mvn.cmd test
+```
+
+### 3. Configure Access & Data
+
+Open the Access & Data run configuration in STS.
+
+Under **Environment**, add these variables using your own Oracle connection details:
+
+```text
+WORKBENCH_DEMO_ENABLED=true
+SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+SPRING_DATASOURCE_USERNAME=YOUR_ORACLE_USERNAME
+SPRING_DATASOURCE_PASSWORD=YOUR_ORACLE_PASSWORD
+```
+
+Each line represents a separate environment variable. Replace the URL if your Oracle address or service name differs.
+
+Keep personal credentials in local run settings.
+
+### 4. Configure Gateway
+
+In the Gateway run configuration, add:
+
+```text
+WORKBENCH_DEMO_ENABLED=true
+```
+
+Demo mode must be enabled in both Gateway and Access & Data.
+
+The `X-Demo-Role` mechanism is for local demonstration. Full authentication and bank identity management are outside this handover.
+
+### 5. Start the backend
+
+Start these main classes in STS:
+
+| Module | Main class |
+|---|---|
+| Access & Data | `com.nbfc.accessdata.Application` |
+| Gateway | `com.nbfc.gateway.Application` |
+
+Confirm Access & Data starts on port 8081 and Gateway on port 8090.
+
+Access & Data uses Flyway migrations V1 through V4 for its tables and reference seed data. Preserve already-applied migrations. Future schema changes must use a new migration.
+
+### 6. Start the frontend
+
+From the repository root:
+
+```cmd
+cd frontend
+npm.cmd ci
+npm.cmd run dev
+```
+
+Open `http://127.0.0.1:5173`.
+
+Use `npm.cmd` on Windows when PowerShell blocks `npm.ps1`.
+
+## Populate a fresh developer database
+
+Git transfers source files; it does not transfer another developer's Oracle records.
+
+Migrations seed the reference records. A fresh database starts without the original developer's saved report history.
+
+1. Enter the demo as **Contributor**.
+2. Select the synthetic bank reference dated `2026-09-30`.
+3. Download the lending-report sample, or use `frontend/public/lending-report-demo.csv`.
+4. Select the CSV and confirm it contains synthetic data.
+5. Click **Validate report**.
+6. After successful validation, click **Save report**.
+7. Note the returned Report ID.
+8. Switch to **Analyst** or **Supervisor**.
+9. Open that report under **Saved lending reports**.
+
+The NBFC A sample contains three loans and quarter revenue of INR 180,000,000.
+
+Other supplied samples include six-month and annual revenue periods, plus invalid files for correction testing.
+
+## Saved-report APIs
+
+Send frontend API requests through Gateway at `http://127.0.0.1:8090`.
+
+Local demo requests use the `X-Demo-Role` header with `CONTRIBUTOR`, `ANALYST` or `SUPERVISOR`.
+
+| Method | Endpoint | Access |
+|---|---|---|
+| POST | `/api/lending-reports/validate` | Contributor |
+| POST | `/api/lending-reports` | Contributor |
+| GET | `/api/lending-reports` | Contributor's own latest 50 reports |
+| GET | `/api/lending-reports/{reportId}` | Contributor's own report |
+| GET | `/api/lending-reports/review?page=0&size=20` | Analyst and Supervisor |
+| GET | `/api/lending-reports/review/{reportId}` | Analyst and Supervisor |
+
+Validation/save requests use multipart fields `referenceId`, `file` and `synthetic`.
+
+Reviewer page numbers start at zero. Page size must be between 1 and 50.
+
+Contributor reads retain bank and submitting-identity filters. Reviewer reads use bank scope across contributor submissions.
+
+The current demo bank is fixed as `SYN-BANK-001`.
+
+## Data and graph rules
+
+- Use synthetic data only.
+- One CSV contains one NBFC's complete loan set for the selected reporting date.
+- Reporting date is an as-of date, not a loan disbursement date.
+- Recorded interest is an existing monetary amount.
+- Total payable = amount lent + recorded interest.
+- Outstanding = total payable minus cumulative amount repaid.
+- Currency is INR and monetary unit is RUPEE.
+- Company revenue is income before expenses for an exact start/end period.
+- Revenue repeats in CSV loan rows but is saved once on the report.
+- Loan graphs read one saved Report ID and its saved loan rows.
+- Repeated submissions remain separate selectable reports.
+- Never sum report history as additional lending or replace saved figures with current reference values.
+- Monetary API fields are decimal strings.
+- Chart coordinates use INR crore; displayed amounts and tooltips retain the original exact values.
+- Use grouped bars for the five loan figures because some figures already include others.
+- The quarter, six-month and annual revenue samples have unequal durations and overlapping periods. They do not establish a valid growth trend.
+- Future revenue comparisons must select one submission per NBFC and period and use equivalent periods. Contributor latest-50 history is not an exhaustive comparison dataset.
+
+## Important source locations
+
+| Location | Purpose |
+|---|---|
+| `backend/access-data/src/main/java/com/nbfc/accessdata/access/LendingReportController.java` | Contributor and reviewer endpoints |
+| `backend/access-data/src/main/java/com/nbfc/accessdata/data/report/` | Saved report services, entities and repositories |
+| `backend/access-data/src/main/java/com/nbfc/accessdata/data/reference/` | Bank loan and revenue references |
+| `backend/access-data/src/main/resources/db/migration/` | Access & Data migrations |
+| `frontend/src/lendingReports.ts` | Reviewer API functions and types |
+| `frontend/src/components/LendingReportReview.tsx` | Paginated report list and selection |
+| `frontend/src/components/LendingReportDetails.tsx` | Selected report details |
+| `frontend/src/components/LendingLoanChart.tsx` | Loan chart and series controls |
+
+## Verification at handover
+
+The developer reported these checks successful on 16 October 2026:
+
+- Frontend TypeScript checking and production build.
+- Existing backend Maven tests.
+- Analyst and Supervisor report list/detail access.
+- Contributor denial on reviewer endpoints.
+- Unauthenticated request rejection.
+- Reviewer denial on contributor validation/save endpoints.
+- Pagination and invalid page parameter handling.
+- Invalid contributor report rejection.
+- Valid report saving and history refresh.
+- Opening the newly saved report under both reviewer roles.
+- Loan chart display and checkbox controls.
+
+The frontend production build reports a non-blocking bundle-size warning.
+
+Additional automated reviewer bank-scoping tests, live Oracle cross-bank integration verification and a complete fresh-clone setup verification remain outstanding.
+
+## Continue development
+
+After checking out the handover branch and ensuring your working tree is clean, create your own development branch:
+
+```cmd
+git switch feature/saved-report-review
+git switch -c feature/your-phase
+```
+
+Before changing business behavior, read `AGENTS.md` and the approved project requirements.
+
+Preserve existing service boundaries, the working contributor flow, contributor-only validation/save actions, bank scoping, exact monetary handling, saved history, dependency versions and applied migrations.
+
+Future stress calculations, alerts, approval workflows and governance integration require reviewed requirements. Existing legacy governance code is separate from the saved-report graph flow.
+
+AI features and dependencies are outside the current scope.
+
+## Related documentation
+
+- [Project engineering rules](AGENTS.md)
+- [Requirements status](docs/requirements-status.md)
+- [Architecture](docs/architecture.md)
+
+Some older documentation describes the separate batch/Kafka flow. This README describes the saved-report handover.
