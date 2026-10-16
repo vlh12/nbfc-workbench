@@ -24,6 +24,7 @@ public class ApiSecurity {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(e -> e.authenticationEntryPoint((request,response,error) -> response.sendError(401)))
             .authorizeHttpRequests(a -> {
+                a.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll();
                 a.requestMatchers("/actuator/health").permitAll();
                 if (demoEnabled) a.anyRequest().authenticated();
                 else a.anyRequest().denyAll();

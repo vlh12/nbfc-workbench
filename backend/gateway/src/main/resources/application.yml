@@ -1,9 +1,11 @@
 server:
   address: ${SERVER_ADDRESS:127.0.0.1}
   port: 8090
+
 spring:
   application:
     name: gateway
+
   cloud:
     gateway:
       server:
@@ -12,11 +14,13 @@ spring:
             - id: access-data
               uri: ${ACCESS_DATA_URL:http://localhost:8081}
               predicates:
-                - Path=/api/batches,/api/batches/**
+                - Path=/api/batches,/api/batches/**,/api/lending-references,/api/lending-references/**,/api/lending-reports,/api/lending-reports/**
+
             - id: exposure-analytics
               uri: ${EXPOSURE_ANALYTICS_URL:http://localhost:8082}
               predicates:
                 - Path=/api/exposures/**
+
   servlet:
     multipart:
       max-file-size: 2MB

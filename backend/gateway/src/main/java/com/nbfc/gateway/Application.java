@@ -6,6 +6,17 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @Import(ApiSecurity.class)
 public class Application {
-    public static void main(String[] args) { SpringApplication.run(Application.class,args); }
+	public static void main(String[] args) {
+	    var applicationContext =
+	        SpringApplication.run(Application.class, args);
+
+	    System.out.println(
+	        "GATEWAY_DEMO_ENABLED=" +
+	        applicationContext.getEnvironment().getProperty(
+	            "WORKBENCH_DEMO_ENABLED",
+	            "false"
+	        )
+	    );
+	}
 }
 
