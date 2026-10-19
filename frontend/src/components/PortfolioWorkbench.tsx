@@ -1,3 +1,10 @@
+import { AnalysisWorkspace } from "./AnalysisWorkspace";
+import type { AnalysisScenario as Run } from "../analysisData";
+import { StressHeatmap } from "./StressHeatmap";
+import { NpaHistoryChart } from "./NpaHistoryChart";
+import { PortfolioIndicators } from "./PortfolioIndicators";
+import { DoughnutChart } from "./DashboardVisuals";
+import { moneyCents } from "../dashboardMetrics";
 import { ContributorUpload } from "./ContributorUpload";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api, auth } from "../auth";
@@ -11,8 +18,7 @@ type Snapshot = { id: string; bankId: string; reportingDate: string; status: str
 type Validation = { rows: Loan[]; warnings: Issue[]; errors: Issue[] };
 type Nbfc = { nbfcId: string; loans: number; amountLent: string; outstandingAmount: string; eadAmount: string | null; portfolioSharePct: string | null; loanStatusAmounts: Record<string, string> };
 type Analysis = { snapshotId: string; totalLent: string; totalOutstanding: string; totalEad: string | null; concentrationDenominator: string; nbfcs: Nbfc[] };
-type Quality = { nbfcId: string; reportingDate: string; buckets: Record<string, string>; totalAmount: string };
-type Run = { id: string; snapshotId: string; nbfcId: string; status: string; createdAt: string; failureReason: string | null; result: { eadAmount: string; eligibleCapital: string; capitalLabel: string; stressedLoss: string; capitalImpactPct: string; concentrationCapitalPct: string; alertSeverity: string; thresholdVersion: string; mediumPct: string; highPct: string; formula: string } | null };
+type Quality = { bankId: string; nbfcId: string; reportingDate: string; buckets: Record<string, string>; totalAmount: string };
 const buckets = ["CURRENT", "DPD_1_30", "DPD_31_60", "DPD_61_90", "NPA_90_PLUS", "RESTRUCTURED", "WRITE_OFF_RECOVERY"];
 const input = "mt-1 w-full rounded border border-slate-300 p-2";
 const box = "rounded-xl border border-slate-200 bg-white p-5";
@@ -44,6 +50,9 @@ export function PortfolioWorkbench() {
   const [runs, setRuns] = useState<Run[]>([]), [currentRun, setCurrentRun] = useState<Run | null>(null), [assessmentNote, setAssessmentNote] = useState("");
   const [qualityCurrent, setQualityCurrent] = useState(""), [qualityPrior, setQualityPrior] = useState(""), [trend, setTrend] = useState<{ current: Quality; prior: Quality | null } | null>(null);
 
+  const [runsLoaded, setRunsLoaded] = useState(false), [runsError, setRunsError] = useState(false);
+  const [trendError, setTrendError] = useState(""), [trendLoading, setTrendLoading] = useState(false);
+
   const refresh = useCallback(async () => {
     try { const rows = await api<Entry[]>("/api/portfolios"); setEntries(rows); setSelected(old => old || rows.find(e => e.kind === "PORTFOLIO" && e.status !== "VALIDATION_FAILED")?.id || ""); }
     catch (e) { setError(errorMessage(e)); }
@@ -58,7 +67,7 @@ export function PortfolioWorkbench() {
   }, [selected, reviewer]);
   useEffect(() => {
     if (!reviewer) return;
-    const load = () => { void api<Run[]>("/api/scenarios").then(setRuns).catch(() => {}); };
+    const load = () => { void api<Run[]>("/api/scenarios").then(rows => { setRuns(rows); setRunsLoaded(true); setRunsError(false); }).catch(() => { setRunsError(true); }); };
     load(); const timer = window.setInterval(load, 5000); return () => clearInterval(timer);
   }, [reviewer]);
   async function perform(action: () => Promise<unknown>, message: string) {
@@ -77,12 +86,14 @@ export function PortfolioWorkbench() {
   function optionList(kind: string) { return entries.filter(e => e.kind === kind && e.status !== "VALIDATION_FAILED").map(e => <option key={e.id} value={e.id}>{e.reportingDate || kind} · {e.id.slice(0, 8)} · {e.status}</option>); }
   const nbfcIds = [...new Set(snapshot?.rows.map(l => l.nbfcId) || [])];
   async function loadTrend() {
-    await perform(async () => {
+    setTrendLoading(true); setTrendError(""); setTrend(null);
+    try {
       const current = await api<Quality>("/api/portfolios/quality/" + qualityCurrent);
       const prior = qualityPrior ? await api<Quality>("/api/portfolios/quality/" + qualityPrior) : null;
-      if (prior && (prior.nbfcId !== current.nbfcId || prior.reportingDate >= current.reportingDate)) throw { message: "Select an earlier snapshot for the same NBFC." };
+      if (prior && (prior.nbfcId !== current.nbfcId || prior.reportingDate >= current.reportingDate)) throw { message: "Select an earlier snapshot for the same NBFC, or choose No comparison." };
       setTrend({ current, prior });
-    }, "Asset-quality context loaded.");
+    } catch (e) { setTrendError(errorMessage(e)); }
+    finally { setTrendLoading(false); }
   }
   return <section className="space-y-5" aria-labelledby="portfolio-title">
     {contributor ? <>
@@ -111,9 +122,11 @@ export function PortfolioWorkbench() {
         <p className="mt-3 text-xs text-slate-500">Loan DPD describes these bank-held loans. It is not the NBFC's own borrower-portfolio asset quality. Row-level reported revenue is preserved and is not summed as company revenue.</p>
       </>}
     </div>
-    {reviewer && analysis && <div className={box}>
+    {reviewer && snapshot && snapshot.id === selected && <AnalysisWorkspace key={"analysis-" + snapshot.id} snapshot={snapshot} entries={entries} runs={runs} runsLoaded={runsLoaded} runsError={runsError} />}
+    {reviewer && analysis && analysis.snapshotId === selected && <div className={box}>
       <h3 className="text-lg font-bold">Selected portfolio analytics</h3>
-      <div className="my-4 grid gap-3 sm:grid-cols-3">{[["Total lent", analysis.totalLent], ["Reported outstanding", analysis.totalOutstanding], ["Explicit EAD", analysis.totalEad]].map(([label, value]) => <div key={label} className="rounded bg-slate-50 p-3"><p className="text-sm">{label}</p><strong>{rupees(value)}</strong></div>)}</div>
+      <PortfolioIndicators totalEad={analysis.totalEad} nbfcs={analysis.nbfcs} snapshotId={analysis.snapshotId} reportingDate={snapshot?.reportingDate} scenario={currentRun} />
+      <p className="mb-3 text-sm text-slate-600">Total lent: {rupees(analysis.totalLent)} · Reported outstanding: {rupees(analysis.totalOutstanding)}</p>
       <p className="text-sm">{analysis.concentrationDenominator}</p>
       <div className="my-4 h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={analysis.nbfcs.map(n => ({ nbfcId: n.nbfcId, outstanding: Number(n.outstandingAmount), outstandingExact: n.outstandingAmount }))}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="nbfcId" /><YAxis tickFormatter={n => (Number(n) / 10000000).toFixed(1) + " Cr"} /><Tooltip formatter={(_value,_name,item)=>rupees((item.payload as {outstandingExact:string}).outstandingExact)} /><Bar dataKey="outstanding" name="Reported outstanding INR" fill="#0f766e" /></BarChart></ResponsiveContainer></div>
       <div className="overflow-auto"><table className="w-full text-left text-sm"><thead><tr><th>NBFC</th><th>Loans</th><th>Outstanding</th><th>EAD</th><th>Share of explicit EAD</th></tr></thead><tbody>{analysis.nbfcs.map(n => <tr className="border-t" key={n.nbfcId}><td className="py-3">{n.nbfcId}</td><td>{n.loans}</td><td>{rupees(n.outstandingAmount)}</td><td>{rupees(n.eadAmount)}</td><td>{n.portfolioSharePct == null ? "Unavailable" : n.portfolioSharePct + "%"}</td></tr>)}</tbody></table></div>
@@ -144,10 +157,15 @@ export function PortfolioWorkbench() {
     </form>}
     {reviewer && <div className={box}>
       <h3 className="font-bold">Approved NBFC asset-quality context</h3>
-      <div className="my-3 grid gap-3 sm:grid-cols-2"><label>Current snapshot<select className={input} value={qualityCurrent} onChange={e => setQualityCurrent(e.target.value)}><option value="">Select</option>{optionList("QUALITY")}</select></label><label>Prior period (optional)<select className={input} value={qualityPrior} onChange={e => setQualityPrior(e.target.value)}><option value="">No comparison</option>{optionList("QUALITY")}</select></label></div>
-      <Button disabled={busy || !qualityCurrent} onClick={() => void loadTrend()}>View asset-quality trend</Button>
-      {trend && <div className="mt-4 overflow-auto"><p>{trend.current.nbfcId} · {trend.current.reportingDate}{trend.prior ? " vs " + trend.prior.reportingDate : ""}</p><table className="mt-3 w-full text-left text-sm"><thead><tr><th>Bucket</th><th>Current</th><th>Prior</th><th>Change INR</th></tr></thead><tbody>{buckets.map(b => <tr className="border-t" key={b}><td className="py-2">{b}</td><td>{rupees(trend.current.buckets[b])}</td><td>{trend.prior ? rupees(trend.prior.buckets[b]) : "Not supplied"}</td><td>{trend.prior ? delta(trend.current.buckets[b], trend.prior.buckets[b]) : "Not supplied"}</td></tr>)}</tbody></table></div>}
+      <div className="my-3 grid gap-3 sm:grid-cols-2"><label>Current snapshot<select className={input} disabled={trendLoading} value={qualityCurrent} onChange={e => { setQualityCurrent(e.target.value); setQualityPrior(""); setTrend(null); setTrendError(""); }}><option value="">Select</option>{optionList("QUALITY")}</select></label><label>Prior period (optional)<select className={input} disabled={trendLoading || !qualityCurrent} value={qualityPrior} onChange={e => { setQualityPrior(e.target.value); setTrend(null); setTrendError(""); }}><option value="">No comparison</option>{entries.filter(e => e.kind === "QUALITY" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id} disabled={!e.reportingDate || e.reportingDate >= (entries.find(c => c.id === qualityCurrent)?.reportingDate || "")}>{e.reportingDate} · {e.id.slice(0, 8)} · {e.status}</option>)}</select></label></div>
+      <p className="mb-3 text-sm text-slate-500">Choose No comparison to view current amounts only. A prior snapshot must be earlier and belong to the same NBFC.</p>
+      <Button disabled={busy || trendLoading || !qualityCurrent} onClick={() => void loadTrend()}>{trendLoading ? "Loading asset-quality trend…" : "View asset-quality trend"}</Button>
+      {trendError && <p role="alert" className="mt-3 rounded bg-red-50 p-3 text-red-900">{trendError}</p>}
+      {trend && <div className="mt-4"><DoughnutChart title="NBFC asset-quality mix" subtitle={trend.current.nbfcId + " · " + trend.current.reportingDate + " · Version " + qualityCurrent.slice(0, 8) + " · Current snapshot only"} slices={buckets.map(name => ({ name, amount: moneyCents(trend.current.buckets[name]) }))} emptyMessage="All asset-quality buckets are zero; no distribution to display." /></div>}
+      {trend && <NpaHistoryChart bankId={trend.current.bankId} nbfcId={trend.current.nbfcId} entries={entries} />}
+      {trend && <div role="region" aria-label="Asset-quality trend results" className="mt-4 overflow-auto"><p>{trend.current.nbfcId} · {trend.current.reportingDate}{trend.prior ? " vs " + trend.prior.reportingDate : ""}</p><table className="mt-3 w-full text-left text-sm"><thead><tr><th>Bucket</th><th>Current</th><th>Prior</th><th>Change INR</th></tr></thead><tbody>{buckets.map(b => <tr className="border-t" key={b}><td className="py-2">{b}</td><td>{rupees(trend.current.buckets[b])}</td><td>{trend.prior ? rupees(trend.prior.buckets[b]) : "Not supplied"}</td><td>{trend.prior ? delta(trend.current.buckets[b], trend.prior.buckets[b]) : "Not supplied"}</td></tr>)}</tbody></table></div>}
     </div>}
+    {reviewer && snapshot && snapshot.id === selected && <StressHeatmap key={snapshot.id} snapshot={snapshot} entries={entries} />}
     {analyst && <form className={box} onSubmit={e => {
       e.preventDefault();
       void perform(async () => { const run = await api<Run>("/api/scenarios", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ snapshotId: selected, nbfcId: nbfc, capitalId, qualityId, thresholdId, severityPct: severity, recoveryPct: recovery, rationale, idempotencyKey: crypto.randomUUID() }) }); setCurrentRun(run); setRuns(old => [run, ...old]); }, "Scenario stored. Review the result or failure reason below.");

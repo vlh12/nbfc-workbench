@@ -6,7 +6,6 @@ import { auth, api } from "./auth";
 import { SupervisorPanel } from "./components/SupervisorPanel";
 import { AssessmentSubmission } from "./components/AssessmentSubmission";
 import { Button } from "./components/ui/button";
-import LendingReportReview from "./components/LendingReportReview";
 
 type Total = { nbfcId: string; amount: string; records: number };
 type Batch = { id: string; rowCount: number; status: string; createdAt: string };
@@ -14,13 +13,6 @@ type Problem = { message?: string; issues?: { line: number; message: string }[] 
 function money(amount: string) {
   const [integer, fraction = ""] = amount.split(".");
   return "₹" + new Intl.NumberFormat("en-IN").format(BigInt(integer)) + "." + fraction.padEnd(2, "0");
-}
-function totalAmount(rows: Total[]) {
-  const cents = rows.reduce((sum, row) => {
-    const [integer, fraction = ""] = row.amount.split(".");
-    return sum + BigInt(integer) * 100n + BigInt(fraction.padEnd(2, "0"));
-  }, 0n);
-  return (cents / 100n).toString() + "." + (cents % 100n).toString().padStart(2, "0");
 }
 export default function App() {
   const contributor = auth.hasRealmRole("CONTRIBUTOR");
@@ -81,10 +73,8 @@ export default function App() {
       {!auth.authenticated ? <section className="rounded-xl border border-slate-200 bg-white p-8"><h2 className="text-2xl font-bold">Your exposure workbench</h2><p className="my-4 text-slate-600">Enter the local demo to upload synthetic exposures, then switch roles to view the analyst summary.</p><Button onClick={() => void auth.login()}>Enter demo</Button></section> : <>
         {!contributor && <div><h2 className="text-2xl font-bold">Exposure overview</h2><p className="mt-1 text-slate-600">Validated synthetic exposure records · INR</p></div>}
         <PortfolioWorkbench />
-        {analyst && <LendingReportReview formatMoney={money} />}
         {analyst && serviceError && <p role="alert" className="rounded-lg bg-amber-50 p-4 text-amber-900">{serviceError} <button className="underline" onClick={() => void refresh()}>Refresh</button></p>}
         {analyst && <>
-          <div className="grid gap-4 sm:grid-cols-3">{[["Total exposure", money(totalAmount(rows))], ["NBFCs represented", String(rows.length)], ["Exposure records", String(rows.reduce((s, r) => s + r.records, 0))]].map(([label, value]) => <article key={label} className="rounded-xl border border-slate-200 bg-white p-5"><p className="text-sm text-slate-600">{label}</p><p className="mt-3 break-words text-2xl font-bold">{loaded ? value : "Loading…"}</p></article>)}</div>
           <section className="rounded-xl border border-slate-200 bg-white p-6"><h3 className="text-lg font-bold">Exposure by NBFC</h3><p className="mb-5 text-sm text-slate-500">Simple totals. No stress assumptions or risk thresholds have been applied.</p>
             {!rows.length ? <p className="py-10 text-center text-slate-500">{loaded ? "No processed exposures yet. Upload the synthetic sample to begin." : "Loading exposure summary…"}</p> : <>
               <div className="h-72" aria-label="Exposure by NBFC chart; exact amounts are in the table below"><ResponsiveContainer width="100%" height="100%"><BarChart data={rows.map(r => ({ ...r, chartAmount: Number(r.amount) }))}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="nbfcId" /><YAxis tickFormatter={v => "₹" + (Number(v) / 100000).toFixed(1) + "L"} /><Tooltip /><Bar dataKey="chartAmount" name="Exposure (INR)" fill="#0f766e" radius={[5, 5, 0, 0]} /></BarChart></ResponsiveContainer></div>

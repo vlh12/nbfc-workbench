@@ -1,0 +1,8 @@
+name,reporting_date,nbfc_id,severity_pct,recovery_pct,threshold_key,expected_loss_inr,expected_capital_impact_pct,expected_alert
+September Baseline,2026-09-30,SYN-NBFC-001,20,30,demo-v1,1680000000,3.36,LOW
+September Moderate,2026-09-30,SYN-NBFC-001,40,30,demo-v1,3360000000,6.72,MEDIUM
+September Severe,2026-09-30,SYN-NBFC-001,60,30,demo-v1,5040000000,10.08,HIGH
+September Threshold comparison v1,2026-09-30,SYN-NBFC-001,50,30,demo-v1,4200000000,8.4,MEDIUM
+September Threshold comparison v2,2026-09-30,SYN-NBFC-001,50,30,demo-v2,4200000000,8.4,HIGH
+August Severe,2026-08-31,SYN-NBFC-001,60,30,demo-v1,4620000000,9.24,MEDIUM
+September Higher recovery,2026-09-30,SYN-NBFC-001,60,50,demo-v1,3600000000,7.2,MEDIUM

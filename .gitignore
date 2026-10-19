@@ -8,3 +8,4 @@ target/
 
 .metadata/
 .vscode/local.env
+samples/full-demo/import-state.json
