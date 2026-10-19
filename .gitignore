@@ -1,0 +1,10 @@
+node_modules/
+dist/
+target/
+.env
+.idea/
+*.log
+
+
+.metadata/
+.vscode/local.env

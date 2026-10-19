@@ -1,0 +1,11 @@
+package com.nbfc.accessdata.data;
+import com.nbfc.shared.ExposureEvent;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
+@Configuration
+class KafkaTopics {
+    @Bean NewTopic exposureTopic() { return TopicBuilder.name(ExposureEvent.TOPIC).partitions(1).replicas(1).build(); }
+}
+

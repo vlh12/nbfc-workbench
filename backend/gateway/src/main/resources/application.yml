@@ -1,0 +1,37 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: 8090
+
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: access-data
+              uri: ${ACCESS_DATA_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/batches,/api/batches/**,/api/lending-references,/api/lending-references/**,/api/lending-reports,/api/lending-reports/**,/api/portfolios,/api/portfolios/**
+
+            - id: exposure-analytics
+              uri: ${EXPOSURE_ANALYTICS_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/exposures/**
+
+            - id: stress-simulation
+              uri: ${STRESS_SIMULATION_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/scenarios,/api/scenarios/**
+
+            - id: risk-governance
+              uri: ${RISK_GOVERNANCE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/governance/**
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB

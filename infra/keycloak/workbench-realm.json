@@ -1,0 +1,93 @@
+{
+  "realm": "workbench",
+  "enabled": true,
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "CONTRIBUTOR"
+      },
+      {
+        "name": "ANALYST"
+      },
+      {
+        "name": "SUPERVISOR"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "workbench-ui",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "contributor",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Synthetic",
+      "lastName": "contributor",
+      "email": "contributor@example.invalid",
+      "realmRoles": [
+        "CONTRIBUTOR"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SyntheticUser26",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "analyst",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Synthetic",
+      "lastName": "analyst",
+      "email": "analyst@example.invalid",
+      "realmRoles": [
+        "ANALYST"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SyntheticUser26",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "supervisor",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Synthetic",
+      "lastName": "supervisor",
+      "email": "supervisor@example.invalid",
+      "realmRoles": [
+        "SUPERVISOR"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "SyntheticUser26",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,19 @@
+CREATE TABLE governance_assessment (
+ id VARCHAR2(36 CHAR) PRIMARY KEY,
+ title VARCHAR2(160 CHAR) NOT NULL,
+ summary VARCHAR2(2000 CHAR) NOT NULL,
+ status VARCHAR2(20 CHAR) NOT NULL,
+ submitted_by VARCHAR2(255 CHAR) NOT NULL,
+ submitted_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+ decision_note VARCHAR2(2000 CHAR),
+ reviewed_by VARCHAR2(255 CHAR),
+ reviewed_at TIMESTAMP(6) WITH TIME ZONE
+);
+CREATE TABLE governance_outbox_event (
+ id VARCHAR2(36 CHAR) PRIMARY KEY,
+ event_type VARCHAR2(80 CHAR) NOT NULL,
+ aggregate_id VARCHAR2(36 CHAR) NOT NULL,
+ payload CLOB NOT NULL,
+ published NUMBER(1) DEFAULT 0 NOT NULL CHECK(published IN (0,1)),
+ created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL
+);

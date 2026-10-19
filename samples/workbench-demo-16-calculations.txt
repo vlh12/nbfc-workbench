@@ -1,0 +1,21 @@
+SYNTHETIC DEMONSTRATION DATASET
+16 exposure records, 4 banks and 4 NBFCs. Currency: INR.
+
+Expected results for this file alone:
+NBFC-001: 1,200,000.00 + 900,000.00 + 700,000.00 + 600,000.00 = 3,400,000.00
+NBFC-002: 800,000.00 + 1,100,000.00 + 450,000.00 + 350,000.00 = 2,700,000.00
+NBFC-003: 600,000.00 + 500,000.00 + 850,000.00 + 400,000.00 = 2,350,000.00
+NBFC-004: 400,000.10 + 250,000.00 + 300,000.00 + 200,000.20 = 1,150,000.30
+Total: 3,400,000.00 + 2,700,000.00 + 2,350,000.00 + 1,150,000.30 = 9,600,000.30
+
+Use Enter demo -> Contributor to upload, then select Analyst.
+New upload adds 16 records, INR 9,600,000.30 and these NBFC amounts to existing exposure data.
+The NBFC count is the number of distinct NBFC IDs across all uploaded data, not the sum of batch counts.
+Uploading this file twice adds 32 records and INR 19,200,000.60; the distinct NBFC count remains 4 if no other NBFCs exist.
+If the old 3-record sample was uploaded exactly once first, the combined total is INR 12,100,000.30 with 19 records and 4 NBFCs.
+
+All calculations currently implemented are covered by this fixture. Stress losses, capital ratios, alert thresholds and supervisor approval workflows are not implemented. Do not present these sums as stress or regulatory risk results.
+
+Fixture totals were checked with exact integer-cents arithmetic during creation.
+Project builds, automated tests, service startup and the browser workflow have not been executed due to the host execution failure.
+

@@ -1,0 +1,20 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: 8083
+spring:
+  application:
+    name: stress-simulation
+  datasource:
+    url: ${DB_URL:jdbc:oracle:thin:@//localhost:1521/FREEPDB1}
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    table: stress_simulation_flyway_history
+    baseline-on-migrate: true
+    baseline-version: "0"
