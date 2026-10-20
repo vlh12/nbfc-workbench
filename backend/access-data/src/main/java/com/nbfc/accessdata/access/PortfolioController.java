@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.*;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name="Portfolios and supporting data",description="Portfolio CSV/JSON uploads, capital, NBFC asset quality and threshold versions.")
 @RestController @RequestMapping("/api/portfolios")
 public class PortfolioController {
     private final PortfolioCsv csv; private final PortfolioStore store;
@@ -21,15 +22,17 @@ public class PortfolioController {
         return result;
     }
     @PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE) @PreAuthorize("hasRole('CONTRIBUTOR')")
-    public ResponseEntity<?> save(@RequestParam MultipartFile file,@RequestParam boolean synthetic,Authentication actor)throws IOException{
+    public ResponseEntity<?> save(@RequestParam MultipartFile file,@RequestParam boolean synthetic,@RequestParam(required=false) String name,Authentication actor)throws IOException{
         checkSynthetic(synthetic); var validation=csv.validate(file.getBytes());
         if(!validation.errors().isEmpty()){
             var rejected=store.rejected(validation,actor.getName());
             return ResponseEntity.unprocessableEntity().body(Map.of("message","No loan rows saved. Correct the listed errors.","submissionId",rejected.id(),"issues",validation.errors()));
         }
-        return ResponseEntity.status(201).body(store.save(validation,actor.getName()));
+        return ResponseEntity.status(201).body(store.save(validation,actor.getName(),name));
     }
-    public record JsonSubmission(List<Loan> rows,boolean synthetic){}
+    public record JsonSubmission(List<Loan> rows,boolean synthetic,String name){
+        public JsonSubmission(List<Loan> rows,boolean synthetic){this(rows,synthetic,null);}
+    }
     @PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE) @PreAuthorize("hasRole('CONTRIBUTOR')")
     public ResponseEntity<?> json(@RequestBody JsonSubmission body,Authentication actor){
         checkSynthetic(body.synthetic());
@@ -51,7 +54,7 @@ public class PortfolioController {
             var rejected=store.rejected(validation,actor.getName());
             return ResponseEntity.unprocessableEntity().body(Map.of("message","No loan rows saved.","submissionId",rejected.id(),"issues",validation.errors()));
         }
-        return ResponseEntity.status(201).body(store.save(validation,actor.getName()));
+        return ResponseEntity.status(201).body(store.save(validation,actor.getName(),body.name()));
     }
     @GetMapping @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
     public List<Entry> list(){return store.list();}

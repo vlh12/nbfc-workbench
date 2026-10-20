@@ -1,3 +1,4 @@
+import { portfolioDetails } from "../portfolioLabels";
 import { useState } from "react";
 import { moneyCents, moneyLabel } from "../dashboardMetrics";
 import { riskDrivers, scenarioRate, versionWarnings, type AnalysisEntry, type AnalysisScenario } from "../analysisData";
@@ -21,7 +22,7 @@ export function ScenarioComparison({ runs, entries, bankId, nbfcId, loaded, load
   const fields: [string, (run: AnalysisScenario) => string][] = [
     ["Run ID", r => r.id], ["Created", r => new Date(r.createdAt).toLocaleString("en-IN")],
     ["Reporting date", r => entries.find(e => e.id === r.snapshotId)?.reportingDate || "Not in loaded inputs"],
-    ["Portfolio version", r => r.snapshotId], ["Model", r => shown(r.modelVersion)],
+    ["Portfolio name / ID", r => portfolioDetails(entries.find(e => e.id === r.snapshotId) || { id: r.snapshotId })], ["Model", r => shown(r.modelVersion)],
     ["Severity", r => scenarioRate(r, "severityPct") == null ? "Not recorded" : scenarioRate(r, "severityPct") + "%"],
     ["Recovery", r => scenarioRate(r, "recoveryPct") == null ? "Not recorded" : scenarioRate(r, "recoveryPct") + "%"],
     ["Explicit EAD", r => money(r.result?.eadAmount)], ["Eligible capital", r => money(r.result?.eligibleCapital)],

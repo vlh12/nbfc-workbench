@@ -2,6 +2,7 @@ package com.nbfc.exposureanalytics;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Exposure totals",description="Legacy exposure totals by NBFC.")
 @RestController
 @RequestMapping("/api/exposures")
 public class ExposureController {

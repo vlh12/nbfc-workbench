@@ -16,9 +16,19 @@ public final class PortfolioData {
     public record Issue(int line, String field, String message) {}
     public record Validation(List<Loan> rows, List<Issue> warnings, List<Issue> errors) {}
     public record Snapshot(String id, String bankId, LocalDate reportingDate, String status,
-        String submittedBy, Instant createdAt, List<Loan> rows, List<Issue> warnings) {}
+        String submittedBy, Instant createdAt, List<Loan> rows, List<Issue> warnings, String name) {
+        public Snapshot { if(name==null || name.isBlank()) name=defaultName(reportingDate); }
+        public Snapshot(String id,String bankId,LocalDate reportingDate,String status,String submittedBy,Instant createdAt,List<Loan> rows,List<Issue> warnings) {
+            this(id,bankId,reportingDate,status,submittedBy,createdAt,rows,warnings,null);
+        }
+    }
     public record Entry(String id, String kind, String bankId, LocalDate reportingDate,
-        String status, String submittedBy, Instant createdAt, int rowCount) {}
+        String status, String submittedBy, Instant createdAt, int rowCount, String name) {
+        public Entry(String id,String kind,String bankId,LocalDate reportingDate,String status,String submittedBy,Instant createdAt,int rowCount) {
+            this(id,kind,bankId,reportingDate,status,submittedBy,createdAt,rowCount,null);
+        }
+    }
+    public static String defaultName(LocalDate reportingDate) { return reportingDate==null?"Portfolio":"Portfolio — "+reportingDate; }
     public record Capital(String bankId, LocalDate reportingDate, String eligibleCapital, String label) {}
     public record Quality(String bankId, String nbfcId, LocalDate reportingDate,
         Map<String, String> buckets, String totalAmount) {}

@@ -1,0 +1,2 @@
+export type WorkspaceView = "dashboard" | "exposure" | "analysis" | "stress" | "alerts" | "assessments" | "history" | "data" | "thresholds" | "reports" | "guide" | "all";
+export const viewTitles: Record<WorkspaceView, string> = { dashboard: "Dashboard", exposure: "Exposure Explorer", analysis: "NBFC Details & Comparisons", stress: "Stress Simulation", alerts: "Risk Alerts", assessments: "Assessments & Follow-up", history: "Scenario History", data: "Data Management", thresholds: "Alert Thresholds", reports: "Downloads & Reports", guide: "User Guide", all: "All Tools" };

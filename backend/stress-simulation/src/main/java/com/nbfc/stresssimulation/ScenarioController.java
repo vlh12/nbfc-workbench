@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import java.util.*;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Stress scenarios",description="Run and retrieve saved stress scenarios with recorded assumptions and results.")
 @RestController @RequestMapping("/api/scenarios")
 public class ScenarioController {
     private final ScenarioService service;

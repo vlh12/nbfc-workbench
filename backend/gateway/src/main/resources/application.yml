@@ -11,6 +11,38 @@ spring:
       server:
         webmvc:
           routes:
+            - id: access-data-openapi
+              uri: ${ACCESS_DATA_URL:http://localhost:8081}
+              predicates:
+                - Path=/openapi/access-data
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            - id: exposure-analytics-openapi
+              uri: ${EXPOSURE_ANALYTICS_URL:http://localhost:8082}
+              predicates:
+                - Path=/openapi/exposure-analytics
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            - id: stress-simulation-openapi
+              uri: ${STRESS_SIMULATION_URL:http://localhost:8083}
+              predicates:
+                - Path=/openapi/stress-simulation
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            - id: risk-governance-openapi
+              uri: ${RISK_GOVERNANCE_URL:http://localhost:8084}
+              predicates:
+                - Path=/openapi/risk-governance
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
             - id: access-data
               uri: ${ACCESS_DATA_URL:http://localhost:8081}
               predicates:
@@ -35,3 +67,31 @@ spring:
     multipart:
       max-file-size: 2MB
       max-request-size: 3MB
+
+springdoc:
+  api-docs:
+    enabled: ${WORKBENCH_DEMO_ENABLED:false}
+    path: /v3/api-docs
+  paths-to-match: /api/**
+  swagger-ui:
+    enabled: ${WORKBENCH_DEMO_ENABLED:false}
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    filter: true
+    persist-authorization: false
+    urls:
+      - name: Access & Data
+        url: /openapi/access-data
+      - name: Exposure Analytics
+        url: /openapi/exposure-analytics
+      - name: Stress Simulation
+        url: /openapi/stress-simulation
+      - name: Risk Governance
+        url: /openapi/risk-governance
+    urls-primary-name: Access & Data
+
+workbench:
+  openapi:
+    title: Workbench API Gateway

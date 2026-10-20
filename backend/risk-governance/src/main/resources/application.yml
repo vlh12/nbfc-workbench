@@ -24,3 +24,21 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       acks: all
+
+springdoc:
+  api-docs:
+    enabled: ${WORKBENCH_DEMO_ENABLED:false}
+    path: /v3/api-docs
+  paths-to-match: /api/**
+  swagger-ui:
+    enabled: ${WORKBENCH_DEMO_ENABLED:false}
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    filter: true
+    persist-authorization: false
+
+workbench:
+  openapi:
+    title: Risk Governance API

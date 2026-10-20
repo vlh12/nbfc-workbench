@@ -1,4 +1,4 @@
-export type AmountSlice = { name: string; amount: bigint };
+export type AmountSlice = { name: string; amount: bigint; members?: { name: string; amount: bigint }[] };
 
 export function moneyCents(value: string): bigint {
   if (!/^\d+(\.\d{1,2})?$/.test(value)) throw new Error("Invalid monetary amount");
@@ -20,8 +20,8 @@ export function exposureMetrics(totalEad: string | null, rows: { nbfcId: string;
     .sort((a, b) => a.amount === b.amount ? a.name.localeCompare(b.name) : a.amount > b.amount ? -1 : 1);
   if (ranked.reduce((sum, row) => sum + row.amount, 0n) !== total) return null;
   const topThree = ranked.slice(0, 3).reduce((sum, row) => sum + row.amount, 0n);
-  const slices = ranked.slice(0, 5);
-  if (ranked.length > 5) slices.push({ name: "Others", amount: ranked.slice(5).reduce((sum, row) => sum + row.amount, 0n) });
+  const slices: AmountSlice[] = ranked.slice(0, 5);
+  if (ranked.length > 5) slices.push({ name: "Others", amount: ranked.slice(5).reduce((sum, row) => sum + row.amount, 0n), members: ranked.slice(5) });
   return { total, largest: ranked[0], topThree, slices };
 }
 export function localDateKey(date = new Date()): string {

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.math.*;
 import java.util.*;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name="Portfolio analytics",description="Explicit EAD, concentration and reported amounts in the selected portfolio.")
 @RestController @RequestMapping("/api/exposures/portfolios")
 public class PortfolioAnalysis {
     private final String access;

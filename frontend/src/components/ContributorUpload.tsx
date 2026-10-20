@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 type Issue = { line: number; field: string; message: string };
 type Validation = { rows: unknown[]; warnings: Issue[]; errors: Issue[] };
 type Props = {
+  portfolioName: string;
+  onPortfolioName: (name: string) => void;
   file: File | null;
   synthetic: boolean;
   busy: boolean;
@@ -14,7 +16,7 @@ type Props = {
   onSave: () => void;
 };
 
-export function ContributorUpload({ file, synthetic, busy, validation, onFile, onSynthetic, onValidate, onSave }: Props) {
+export function ContributorUpload({ portfolioName, onPortfolioName, file, synthetic, busy, validation, onFile, onSynthetic, onValidate, onSave }: Props) {
   const picker = useRef<HTMLInputElement>(null);
   useEffect(() => { if (!file && picker.current) picker.current.value = ""; }, [file]);
   const valid = !!validation && validation.errors.length === 0 && validation.rows.length > 0;
@@ -32,6 +34,8 @@ export function ContributorUpload({ file, synthetic, busy, validation, onFile, o
     </div>
     <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_230px]">
       <form onSubmit={onValidate} className="min-w-0 space-y-4">
+        <label className="block text-sm font-medium text-slate-800">Portfolio name<input type="text" required maxLength={120} disabled={busy} value={portfolioName} onChange={e => onPortfolioName(e.target.value)} placeholder="September 2026 Exposure Portfolio" aria-describedby="portfolio-name-help" className="mt-2 block w-full rounded-lg border border-slate-300 bg-white p-3 text-sm" /></label>
+        <p id="portfolio-name-help" className="text-xs text-slate-500">Use a meaningful name. A unique portfolio ID is generated when you save; both name and ID stay visible.</p>
         <label className={"block rounded-xl border-2 border-dashed p-6 transition " + (file ? "border-teal-300 bg-teal-50/40" : "border-slate-300 bg-slate-50")}>
           <span className="mb-3 block font-semibold text-slate-800">{file ? "File selected" : "Choose your portfolio CSV"}</span>
           <input ref={picker} type="file" accept=".csv,text/csv" required disabled={busy} onChange={e => onFile(e.target.files?.[0] || null)} className="block w-full min-w-0 text-sm text-slate-600 file:mr-3 file:rounded-lg file:border file:border-slate-200 file:bg-white file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-100" aria-describedby="portfolio-file-help" />
@@ -40,7 +44,7 @@ export function ContributorUpload({ file, synthetic, busy, validation, onFile, o
         {file && <p className="break-all text-xs text-slate-500">{file.name} ({(file.size / 1024).toFixed(1)} KB)</p>}
         <label className="flex cursor-pointer items-start gap-3 text-sm text-slate-600"><input type="checkbox" checked={synthetic} disabled={busy} required onChange={e => onSynthetic(e.target.checked)} className="mt-0.5 h-4 w-4 accent-teal-800" /><span>I confirm this file contains synthetic data only.</span></label>
         <div className="flex flex-wrap items-center gap-3">
-          <Button disabled={busy || !file || !synthetic}>{busy ? "Please wait..." : validation ? "Validate again" : "Validate file"}</Button>
+          <Button disabled={busy || !file || !synthetic || !portfolioName.trim()}>{busy ? "Please wait..." : validation ? "Validate again" : "Validate file"}</Button>
           <span className="text-xs text-slate-500">Nothing is shared until you save.</span>
         </div>
       </form>
@@ -59,7 +63,7 @@ export function ContributorUpload({ file, synthetic, busy, validation, onFile, o
         {validation.errors.length > 0 && <ul className="mt-3 max-h-56 list-disc space-y-2 overflow-auto pl-5 text-sm">{validation.errors.map((issue, i) => <li key={i}>Line {issue.line} - {issue.field}: {issue.message}</li>)}</ul>}
         {validation.warnings.length > 0 && <details className="mt-3"><summary className="cursor-pointer text-sm font-medium">View warnings ({validation.warnings.length})</summary><ul className="mt-3 max-h-56 list-disc space-y-2 overflow-auto pl-5 text-sm">{validation.warnings.map((issue, i) => <li key={i}>Line {issue.line} - {issue.field}: {issue.message}</li>)}</ul></details>}
       </div>
-      {valid && <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="max-w-lg text-sm text-slate-500">Saving makes this portfolio available to the analyst and supervisor.{validation.warnings.length > 0 && " Warnings remain visible and may prevent stress approval."}</p><Button onClick={onSave} disabled={busy}>Save portfolio</Button></div>}
+      {valid && <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="max-w-lg text-sm text-slate-500">Saving makes this portfolio available to the analyst and supervisor.{validation.warnings.length > 0 && " Warnings remain visible and may prevent stress approval."}</p><Button onClick={onSave} disabled={busy || !portfolioName.trim()}>Save portfolio</Button></div>}
     </div>}
   </div>;
 }

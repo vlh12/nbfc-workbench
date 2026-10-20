@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name="Lending reference data",description="Legacy reference-based contributor inputs.")
 @RestController
 @RequestMapping("/api/lending-references")
 @PreAuthorize("hasRole('CONTRIBUTOR')")

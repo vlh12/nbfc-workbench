@@ -1,3 +1,4 @@
+import { portfolioDetails } from "../portfolioLabels";
 import { useState } from "react";
 import { api } from "../auth";
 import { moneyCents, moneyLabel } from "../dashboardMetrics";
@@ -5,7 +6,7 @@ import { stressPreview } from "../riskExploration";
 import { Button } from "./ui/button";
 
 type Entry = { id: string; kind: string; reportingDate: string | null; status: string };
-type Portfolio = { id: string; bankId: string; reportingDate: string; status: string; rows: { nbfcId: string; eadAmount: string | null }[] };
+type Portfolio = { name?: string | null; id: string; bankId: string; reportingDate: string; status: string; rows: { nbfcId: string; eadAmount: string | null }[] };
 type Preview = { cells: ReturnType<typeof stressPreview>[]; ead: string; capital: string; capitalLabel: string; medium: string; high: string; nbfc: string; capitalId: string; thresholdId: string };
 const steps = [0, 20, 40, 60, 80, 100];
 const input = "mt-1 w-full rounded border border-slate-300 p-2";
@@ -37,7 +38,7 @@ export function StressHeatmap({ snapshot, entries }: { snapshot: Portfolio; entr
     finally { setLoading(false); }
   }
   return <section aria-label="Severity–recovery heatmap" className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-    <div><h3 className="text-lg font-bold">Severity–recovery heatmap</h3><p className="mt-1 text-sm text-slate-600">Explore capital impact using the existing direct-loss model. Preview only: no scenario or alert is saved.</p><p className="mt-1 text-xs text-slate-500">Portfolio {snapshot.id.slice(0, 8)} · {snapshot.reportingDate} · INR</p></div>
+    <div><h3 className="text-lg font-bold">Severity–recovery heatmap</h3><p className="mt-1 text-sm text-slate-600">Explore capital impact using the existing direct-loss model. Preview only: no scenario or alert is saved.</p><p className="mt-1 break-words text-xs text-slate-500">Portfolio {portfolioDetails(snapshot)} · {snapshot.reportingDate} · INR</p></div>
     <div className="grid gap-3 sm:grid-cols-3">
       <label>Heatmap NBFC<select className={input} disabled={loading} value={nbfc} onChange={e => { setNbfc(e.target.value); clear(); }}><option value="">Select</option>{nbfcs.map(id => <option key={id}>{id}</option>)}</select></label>
       <label>Heatmap capital version<select className={input} disabled={loading} value={capitalId} onChange={e => { setCapitalId(e.target.value); clear(); }}><option value="">Select</option>{entries.filter(e => e.kind === "CAPITAL" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id}>{e.reportingDate} · {e.id.slice(0, 8)}</option>)}</select></label>

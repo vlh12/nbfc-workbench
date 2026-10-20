@@ -58,7 +58,7 @@ assert.equal(sameInstant[0].id,'b');
    }
    await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
   });
-  await page.goto(process.env.UI_TEST_URL||'http://localhost:5173/',{waitUntil:'networkidle'});
+  await page.goto(process.env.UI_TEST_URL||'http://localhost:5173/',{waitUntil:'networkidle'});if(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible()) await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'All tools',exact:true}).click();
   const heatmap=page.getByRole('region',{name:'Severity–recovery heatmap',exact:true});
   const history=page.getByRole('region',{name:'NPA percentage history',exact:true});
   await page.getByLabel('Heatmap capital version').selectOption('capital');await page.getByLabel('Heatmap threshold version').selectOption('threshold');
@@ -80,8 +80,8 @@ assert.equal(sameInstant[0].id,'b');
   if(process.env.UI_SCREENSHOT_DIR)await history.screenshot({path:path.join(process.env.UI_SCREENSHOT_DIR,'npa-percentage-line.png')});
   await page.setViewportSize({width:390,height:844});assert.equal(await history.evaluate(el=>el.getBoundingClientRect().right<=innerWidth),true);assert.equal(await heatmap.evaluate(el=>el.getBoundingClientRect().right<=innerWidth),true);
   failHistory=true;await history.getByRole('button',{name:'Load NPA history'}).click();await history.getByRole('alert').waitFor();assert.equal(await history.locator('table').count(),0);failHistory=false;
-  mode='single';await page.reload({waitUntil:'networkidle'});await page.getByLabel('Current snapshot').selectOption('sep-current');await page.getByRole('button',{name:'View asset-quality trend',exact:true}).click();await history.getByRole('button',{name:'Load NPA history'}).click();await history.getByText(/At least two distinct reporting dates/).waitFor();assert.equal(await history.locator('.recharts-line-curve').count(),0);
-  mode='unapproved';await page.reload({waitUntil:'networkidle'});await page.getByLabel('Heatmap capital version').selectOption('capital');await page.getByLabel('Heatmap threshold version').selectOption('threshold');await heatmap.getByRole('button',{name:'Generate heatmap preview'}).click();await heatmap.getByRole('alert').getByText(/Select an approved portfolio/).waitFor();
+  mode='single';await page.reload({waitUntil:'networkidle'});if(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible()) await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'All tools',exact:true}).click();await page.getByLabel('Current snapshot').selectOption('sep-current');await page.getByRole('button',{name:'View asset-quality trend',exact:true}).click();await history.getByRole('button',{name:'Load NPA history'}).click();await history.getByText(/At least two distinct reporting dates/).waitFor();assert.equal(await history.locator('.recharts-line-curve').count(),0);
+  mode='unapproved';await page.reload({waitUntil:'networkidle'});if(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible()) await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.getByRole('button',{name:'All tools',exact:true}).click();await page.getByLabel('Heatmap capital version').selectOption('capital');await page.getByLabel('Heatmap threshold version').selectOption('threshold');await heatmap.getByRole('button',{name:'Generate heatmap preview'}).click();await heatmap.getByRole('alert').getByText(/Select an approved portfolio/).waitFor();
   assert.deepEqual(writes,[]);assert.deepEqual(errors,[]);
   console.log('PASS: heatmap formula/rounding/boundaries, 36 previews, stale/unapproved input blocking, no writes, correct NBFC/latest versions, zero-total gaps, single-period and failed-history handling, mobile widths (synthetic mocked APIs).');
  }finally{await browser.close();}

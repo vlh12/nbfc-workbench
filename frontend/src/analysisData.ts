@@ -1,8 +1,8 @@
 import { moneyCents, moneyLabel, shareLabel } from "./dashboardMetrics";
 
 export type AnalysisLoan = { loanId: string; nbfcId: string; amountLent: string; outstandingAmount: string; eadAmount: string | null; dpdDays: number; loanStatus: string };
-export type AnalysisPortfolio = { id: string; bankId: string; reportingDate: string; status: string; rows: AnalysisLoan[]; warnings: { line: number; field: string; message: string }[] };
-export type AnalysisEntry = { id: string; kind: string; reportingDate: string | null; status: string; createdAt: string };
+export type AnalysisPortfolio = { name?: string | null; id: string; bankId: string; reportingDate: string; status: string; rows: AnalysisLoan[]; warnings: { line: number; field: string; message: string }[] };
+export type AnalysisEntry = { name?: string | null; id: string; kind: string; reportingDate: string | null; status: string; createdAt: string };
 export type AnalysisScenario = {
   id: string; bankId: string; snapshotId: string; nbfcId: string; status: string; createdAt: string;
   modelVersion?: string; failureReason: string | null;

@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration
 @EnableMethodSecurity
+@Import(OpenApiDocumentation.class)
 public class ApiSecurity {
     @Bean SecurityFilterChain security(HttpSecurity http,
             @Value("${WORKBENCH_DEMO_ENABLED:false}") boolean demoEnabled) throws Exception {
@@ -26,7 +27,11 @@ public class ApiSecurity {
             .authorizeHttpRequests(a -> {
                 a.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll();
                 a.requestMatchers("/actuator/health").permitAll();
-                if (demoEnabled) a.anyRequest().authenticated();
+                if (demoEnabled) {
+                    a.requestMatchers(org.springframework.http.HttpMethod.GET,
+                        "/swagger-ui.html","/swagger-ui/**","/v3/api-docs","/v3/api-docs/**","/v3/api-docs.yaml","/openapi/**").permitAll();
+                    a.anyRequest().authenticated();
+                }
                 else a.anyRequest().denyAll();
             });
         if (demoEnabled) http.addFilterBefore(new DemoRoleFilter(),AnonymousAuthenticationFilter.class);

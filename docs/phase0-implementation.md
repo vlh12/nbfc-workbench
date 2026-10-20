@@ -142,3 +142,53 @@ Scope: the existing endpoints return the latest 100 mixed portfolio input entrie
 Validation command: `node scripts/check-analysis-ui.cjs` using the same PLAYWRIGHT_MODULE_PATH / UI_CHROME_PATH setup as the other browser checks. Synthetic fixtures test exact monetary changes, zero/missing EAD, newly listed/absent NBFCs, date/bank guards, loan isolation, history, all comparison columns, different versions, single/multiple changed drivers, incomplete evidence, service failures, mobile widths and no writes. Browser checks mock APIs and do not establish Oracle integration.
 
 The full synthetic demo pack is tracked in [samples/full-demo](../samples/full-demo/README.txt). Open its data-entry-guide.html for manual input values or run Import-Demo.ps1 with PowerShell 7. Default mode validates only; -Import appends synthetic records through local demo APIs. No live import checkpoint is included.
+
+## Contributor portfolio names (20 October 2026)
+
+Contributor uploads now ask for Portfolio name (trimmed, 1–120 characters). Save persists that name with the immutable portfolio JSON payload. The existing generated UUID remains the identifier for every API, analysis, scenario and governance link. Selectors show `name · ID short-id · reporting date · status`; details show name and full ID. The same identity display is used in the analysis desk, period/scenario comparisons, analytics and heatmap. Scenario names, thresholds and follow-up workflows are unchanged.
+
+Snapshot and metadata responses now include `name`. Multipart POST `/api/portfolios` accepts `name`; the JSON submission accepts the same optional field. Blank, overlong and control-character names are rejected. Older API clients that omit the field receive a date-based default so existing import scripts continue to work. New interactive saves require the name. Existing stored portfolios without a name are read with `Portfolio — YYYY-MM-DD` as a fallback; they are not rewritten. Duplicate human names are permitted because IDs remain unique. Naming never changes APPROVED/VALIDATED rules or the CSV format. No table or schema migration is required.
+
+The tracked full-demo importer supplies `Demo portfolio — YYYY-MM-DD` on new saves. Existing checkpoints continue referring to the original immutable IDs. Restart all backend services from VS Code after rebuilding to load the shared DTO/API change, then refresh the frontend. Backend tests cover named multipart/JSON responses, stored-name/list round trips, duplicate-name IDs, invalid names and legacy JSON. Browser tests cover the contributor field, multipart submission, navigation retention, clearing after save, and name/ID display in reviewer comparisons.
+
+## Swagger API explorer (20 October 2026)
+
+Each business service now serves Swagger UI at /swagger-ui/index.html and JSON at /v3/api-docs. The gateway at port 8090 provides a four-service selector and GET-only /openapi/{service} proxies. Endpoints are generated from the existing controllers, grouped by purpose, with request schemas and the existing X-Demo-Role security requirement. WORKBENCH_DEMO_ENABLED controls both documentation enablement and public GET access to the documentation assets; business APIs remain authenticated and role-checked. No business behavior, database schema or credentials changed for documentation. See [runbook](runbook.md#swagger-ui-and-openapi-20-october-2026) for every URL and authorization instructions.
+
+
+## Selected portfolio exposure chart (20 October 2026)
+
+The analyst and supervisor Exposure by NBFC chart uses GET /api/exposures/portfolios/{id}, shared with the selected portfolio analytics. It displays explicit EAD per NBFC and loan counts, with exact INR amounts in the table and tooltip. Switching portfolios clears the prior chart while data loads. Missing EAD is shown as unavailable rather than zero; no EAD is derived from outstanding. The dashboard no longer requests the legacy /api/exposures/summary endpoint. Legacy upload and Kafka processing APIs remain available separately.
+
+Verification for the exposure chart change: Maven reactor tests passed (52 tests); frontend type checking and production build passed. The synthetic mocked-API browser check passed for selected-portfolio EAD, switching without stale rows, deselection, missing/zero EAD, analyst/supervisor visibility and absence of legacy-summary requests, alongside the existing dashboard checks. This does not verify live Oracle contents or live service availability. The existing Vite bundle-size warning remains.
+
+
+## Pie chart detail (20 October 2026)
+
+The EAD share doughnut retains the five largest NBFCs plus Others for readable geometry. An expanded, collapsible Others breakdown lists every remaining NBFC, exact EAD and share of the full portfolio. It shows the combined amount, share and member count, explains that constituents are already included in the portfolio total, and includes the count in the slice tooltip. No financial calculation, stored input or API contract changes. Charts without grouped categories keep their existing complete category tables.
+
+Verification: 52 backend tests passed; frontend type checking and production build passed. Synthetic browser checks passed for the expanded Others table, individual amounts and full-portfolio percentages, collapse/expand, existing dashboard behavior and mobile layout. Arithmetic checks confirm members reconcile to the Others total and five NBFCs do not create an Others group. Live Oracle data was not changed or checked.
+
+
+## Threshold save feedback (20 October 2026)
+
+The supervisor threshold form displays its own save confirmation with the submitted name, returned version ID and exact LOW/MEDIUM/HIGH boundaries. Save failures appear beside that form and retain the entered values. Confirmation records the submitted values, so subsequent unsaved edits cannot alter the displayed saved version. Existing scenario thresholds remain immutable; saving does not automatically select or apply the new version. No backend or threshold classification rules changed.
+
+Verification: all 52 backend tests, frontend type checking and production build passed. The synthetic mocked-API browser check verified local threshold confirmation, saved name/ID/bands, unchanged saved values during draft edits, local rejection feedback with retained inputs and successful correction/retry. Live Oracle writes were not exercised.
+
+
+## Reference-inspired workspace redesign (20 October 2026)
+
+The supplied dashboard image guides the navy sidebar, blue actions, pale workspace, compact KPI cards, chart row, data tables and quick actions. Displayed values come from saved synthetic inputs, not the image's example bank, names, thresholds or amounts. The bank remains the existing fixed synthetic demo bank.
+
+- Dashboard: exact portfolio EAD and NBFC counts; latest completed saved alert per NBFC; latest or explicitly selected scenario loss, never a sum of alternative scenarios; top-ten EAD bars; top-five-plus-Others composition with constituent details; concentration against portfolio EAD or explicitly selected matching-date eligible capital.
+- Reporting period and portfolio controls scope the current dashboard. Earlier-period exposure and NBFC-count changes use the latest loaded earlier reporting date/version; unavailable or incomplete history remains labelled. Top NBFC links open that NBFC's analysis.
+- Sidebar: Exposure Explorer, NBFC Details and comparisons, Stress Simulation, saved Risk Alerts, Assessments/Review & Follow-up, Scenario History, Downloads & Reports, supervisor thresholds, User Guide, and All tools. Contributor navigation retains Data Management, every upload format and supporting-data forms.
+- All existing workbench sections remain mounted while hidden navigation panels preserve draft inputs. Portfolio switching retains the original immutable-snapshot behavior. Existing validation, explicit Save, stress calculations, heatmap, NPA history, comparisons, supervisor decisions, evidence lifecycle and audit APIs are preserved.
+- Saved alerts/history support search, status/band filters, selected or all loaded portfolios and opening recorded results. These are saved scenario classifications, not a new background notification service. The latest-100-run/input-list limits remain explicit.
+- Report export provides a readable standalone HTML report (printable to PDF), full JSON evidence, loan CSV and scenario CSV. Exports include saved selected-portfolio data; HTML is escaped and CSV formula prefixes are neutralized. Original upload-template downloads remain available.
+- Responsive navigation supports a collapsible desktop sidebar and a mobile drawer, focus styling, labelled controls, scrollable tables and reduced-motion preferences.
+
+Verification: all 52 backend tests passed. Existing contributor, dashboard, analysis and risk-exploration browser suites passed through the real sidebar's All tools view. New synthetic workspace tests cover actual KPI arithmetic, prior-period switching, matching-capital concentration, NBFC drill-down, retained drafts, alerts/history, downloads, three-role navigation, mobile width and unavailable-service behavior. A stale prior-period render on period switching was caught by the new test and fixed with version matching. Desktop/mobile previews were inspected locally. Live read-only checks through the frontend proxy succeeded for 50 saved input records, selected-portfolio analytics (8 NBFCs with EAD), 13 saved scenarios, 11 assessments and 2 follow-up actions; the live analyst dashboard rendered without browser exceptions. No live API writes were performed.
+
+Final frontend type checking and production build passed after the period-switch fix. The existing Vite large-bundle warning remains; it does not block the build.

@@ -1,17 +1,18 @@
+import { portfolioDetails } from "../portfolioLabels";
 import { DoughnutChart, KpiCard } from "./DashboardVisuals";
 import { exposureMetrics, moneyCents, moneyLabel, shareLabel } from "../dashboardMetrics";
 
 type Scenario = { id: string; snapshotId: string; nbfcId: string; status: string; result: { stressedLoss: string; capitalImpactPct: string } | null };
-export function PortfolioIndicators({ totalEad, nbfcs, snapshotId, reportingDate, scenario }: {
+export function PortfolioIndicators({ totalEad, nbfcs, snapshotId, reportingDate, name, scenario }: {
   totalEad: string | null; nbfcs: { nbfcId: string; eadAmount: string | null }[];
-  snapshotId: string; reportingDate?: string; scenario: Scenario | null;
+  snapshotId: string; reportingDate?: string; name?: string | null; scenario: Scenario | null;
 }) {
   const metrics = exposureMetrics(totalEad, nbfcs);
   const selectedScenario = scenario?.snapshotId === snapshotId && scenario.status === "COMPLETED" && scenario.result ? scenario : null;
   const missing = metrics ? "No positive EAD" : "Incomplete EAD";
   const scenarioDetail = selectedScenario ? selectedScenario.nbfcId + " · Run " + selectedScenario.id.slice(0, 8) : "Select a completed scenario for this portfolio below.";
   return <div className="my-4 space-y-4">
-    <p className="text-xs text-slate-500">Selected portfolio · {reportingDate} · Version {snapshotId.slice(0, 8)} · INR</p>
+    <p className="break-words text-xs text-slate-500">Selected portfolio · {portfolioDetails({ id: snapshotId, name, reportingDate })} · {reportingDate} · INR</p>
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
       <KpiCard label="Total explicit EAD" value={metrics ? moneyLabel(metrics.total) : missing} detail="Selected portfolio only" />
       <KpiCard label="Largest NBFC share" value={metrics && metrics.total > 0n ? shareLabel(metrics.largest?.amount || 0n, metrics.total) : missing} detail={metrics && metrics.total > 0n ? metrics.largest?.name : "Requires complete positive EAD"} />

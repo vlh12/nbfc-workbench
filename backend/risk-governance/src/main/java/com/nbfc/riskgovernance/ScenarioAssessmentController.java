@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Scenario assessments",description="Submit completed scenario evidence for supervisor review.")
 @RestController @RequestMapping("/api/governance")
 public class ScenarioAssessmentController {
     private final GovernanceService service; private final String stress;

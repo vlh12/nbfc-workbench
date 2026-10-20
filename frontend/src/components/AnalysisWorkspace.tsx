@@ -1,19 +1,21 @@
-import { useState } from "react";
+import { portfolioDetails } from "../portfolioLabels";
+import { useEffect, useState } from "react";
 import { moneyCents, moneyLabel, shareLabel } from "../dashboardMetrics";
 import { sumExposure, scenarioRate, type AnalysisEntry, type AnalysisPortfolio, type AnalysisScenario } from "../analysisData";
 import { KpiCard } from "./DashboardVisuals";
 import { NpaHistoryChart } from "./NpaHistoryChart";
 import { PeriodComparison } from "./PeriodComparison";
 import { ScenarioComparison } from "./ScenarioComparison";
-export function AnalysisWorkspace({ snapshot, entries, runs, runsLoaded, runsError }: {
-  snapshot: AnalysisPortfolio; entries: AnalysisEntry[]; runs: AnalysisScenario[]; runsLoaded: boolean; runsError: boolean;
+export function AnalysisWorkspace({ snapshot, entries, runs, runsLoaded, runsError, initialNbfc }: {
+  initialNbfc?: string; snapshot: AnalysisPortfolio; entries: AnalysisEntry[]; runs: AnalysisScenario[]; runsLoaded: boolean; runsError: boolean;
 }) {
   const [view, setView] = useState("nbfc"), [nbfc, setNbfc] = useState(snapshot.rows[0]?.nbfcId || ""), [showHistory, setShowHistory] = useState(false);
   const nbfcIds = [...new Set(snapshot.rows.map(row => row.nbfcId))].sort();
+  useEffect(()=>{if(initialNbfc && snapshot.rows.some(row=>row.nbfcId===initialNbfc)){setNbfc(initialNbfc);setView("nbfc");setShowHistory(false);}},[initialNbfc,snapshot.id]);
   const loans = snapshot.rows.filter(row => row.nbfcId === nbfc), totals = sumExposure(loans), portfolio = sumExposure(snapshot.rows);
   const matchingRuns = runs.filter(run => run.bankId === snapshot.bankId && run.nbfcId === nbfc && run.snapshotId === snapshot.id);
   return <section aria-label="Analysis desk" className="min-w-0 space-y-5 rounded-xl border border-teal-200 bg-white p-5">
-    <div><h3 className="text-xl font-bold">Analysis desk</h3><p className="mt-1 text-sm text-slate-600">Investigate one NBFC, compare reporting periods, and explain saved stress results.</p><p className="mt-1 break-words text-xs text-slate-500">Selected portfolio {snapshot.id} · {snapshot.reportingDate} · {snapshot.status} · {snapshot.bankId}</p></div>
+    <div><h3 className="text-xl font-bold">Analysis desk</h3><p className="mt-1 text-sm text-slate-600">Investigate one NBFC, compare reporting periods, and explain saved stress results.</p><p className="mt-1 break-words text-xs text-slate-500">Selected portfolio {portfolioDetails(snapshot)} · {snapshot.reportingDate} · {snapshot.status} · {snapshot.bankId}</p></div>
     <nav aria-label="Analysis tools" className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">{[["nbfc", "NBFC analysis"], ["period", "Period comparison"], ["scenario", "Scenario comparison"]].map(([id, label]) => <button type="button" key={id} aria-pressed={view === id} onClick={() => setView(id)} className={"rounded-lg px-4 py-2 text-sm font-semibold " + (view === id ? "bg-teal-800 text-white" : "bg-slate-100 text-slate-700")}>{label}</button>)}</nav>
     {view !== "period" && <label className="block max-w-md text-sm">Analysis NBFC<select className="mt-1 w-full rounded border border-slate-300 p-2" value={nbfc} onChange={e => { setNbfc(e.target.value); setShowHistory(false); }}><option value="">Select an NBFC</option>{nbfcIds.map(id => <option key={id}>{id}</option>)}</select></label>}
     <div hidden={view !== "nbfc"}>

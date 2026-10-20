@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name="Legacy lending reports",description="Validation, saving and reading legacy lending reports.")
 @RestController
 @RequestMapping("/api/lending-reports")
 public class LendingReportController {

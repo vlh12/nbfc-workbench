@@ -16,12 +16,19 @@ public class PortfolioStore {
     private final PortfolioDocuments documents; private final ObjectMapper json;
     public PortfolioStore(PortfolioDocuments documents,ObjectMapper json){this.documents=documents;this.json=json;}
     @Transactional
-    public Snapshot save(Validation result,String actor){
+    public Snapshot save(Validation result,String actor){ return save(result,actor,null); }
+    @Transactional
+    public Snapshot save(Validation result,String actor,String name){
+        if(name!=null) {
+            require(name.chars().noneMatch(Character::isISOControl),"Portfolio name cannot contain control characters.");
+            name=name.strip();
+            require(!name.isBlank()&&name.length()<=120,"Provide a portfolio name from 1 to 120 characters.");
+        }
         if(!result.errors().isEmpty()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,"Correct the validation errors.");
         var first=result.rows().getFirst();
         String status=result.warnings().isEmpty()?"APPROVED":"VALIDATED";
         String id=UUID.randomUUID().toString(); Instant now=Instant.now();
-        var snapshot=new Snapshot(id,first.bankId(),first.reportingDate(),status,actor,now,result.rows(),result.warnings());
+        var snapshot=new Snapshot(id,first.bankId(),first.reportingDate(),status,actor,now,result.rows(),result.warnings(),name);
         put(id,"PORTFOLIO",snapshot.bankId(),snapshot.reportingDate(),status,actor,result.rows().size(),now,snapshot);
         return snapshot;
     }
@@ -63,6 +70,14 @@ public class PortfolioStore {
         try{d.payload=json.writeValueAsString(payload);}catch(JsonProcessingException e){throw new IllegalStateException(e);}
         return entry(documents.save(d));
     }
-    private Entry entry(PortfolioDocument d){return new Entry(d.id,d.kind,d.bankId,d.reportingDate,d.status,d.submittedBy,d.createdAt,d.rowCount);}
+    private Entry entry(PortfolioDocument d){
+        String name=null;
+        if("PORTFOLIO".equals(d.kind)&&!"VALIDATION_FAILED".equals(d.status)) {
+            try { name=json.readTree(d.payload).path("name").asText(null); }
+            catch(JsonProcessingException e){throw new IllegalStateException("Stored portfolio could not be read.",e);}
+            if(name==null||name.isBlank())name=PortfolioData.defaultName(d.reportingDate);
+        }
+        return new Entry(d.id,d.kind,d.bankId,d.reportingDate,d.status,d.submittedBy,d.createdAt,d.rowCount,name);
+    }
     private static void require(boolean valid,String message){if(!valid)throw new IllegalArgumentException(message);}
 }

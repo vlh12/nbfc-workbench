@@ -11,7 +11,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE_PATH || "playwright")
     return { loanId: v[2], nbfcId: v[1], amountLent: v[5], outstandingAmount: v[9], eadAmount: null, dpdDays: Number(v[10]), loanStatus: v[11], instrumentType: v[4], collateralType: v[13], revenueAmount: v[16], revenuePeriodStart: v[14], revenuePeriodEnd: v[15] };
   });
   const warnings = [{ line: 1, field: "ead_amount", message: "No explicit EAD supplied. Review is available; stress calculations are blocked." }];
-  const snapshot = { id: "synthetic-portfolio-1", bankId: "SYN-BANK-001", reportingDate: "2026-09-30", status: "VALIDATED", rows: loans, warnings };
+  const snapshot = { name: "September Demo Portfolio", id: "synthetic-portfolio-1", bankId: "SYN-BANK-001", reportingDate: "2026-09-30", status: "VALIDATED", rows: loans, warnings };
+  const portfolioName = "September Demo Portfolio";
   let saved = false;
   const legacyRequests = [];
   const browser = await chromium.launch({ executablePath: process.env.UI_CHROME_PATH, headless: true });
@@ -26,8 +27,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE_PATH || "playwright")
       const url = new URL(request.url());
       let body = [];
       if (url.pathname === "/api/portfolios/validate") body = { rows: loans, warnings, errors: [] };
-      else if (url.pathname === "/api/portfolios" && request.method() === "POST") { saved = true; body = snapshot; }
-      else if (url.pathname === "/api/portfolios") body = saved ? [{ id: snapshot.id, kind: "PORTFOLIO", reportingDate: snapshot.reportingDate, status: snapshot.status, createdAt: "2026-10-18T12:00:00Z", rowCount: 16 }] : [];
+      else if (url.pathname === "/api/portfolios" && request.method() === "POST") { assert.match(request.postDataBuffer().toString("utf8"), /name="name"\r\n\r\nSeptember Demo Portfolio/); saved = true; body = snapshot; }
+      else if (url.pathname === "/api/portfolios") body = saved ? [{ name: snapshot.name, id: snapshot.id, kind: "PORTFOLIO", reportingDate: snapshot.reportingDate, status: snapshot.status, createdAt: "2026-10-18T12:00:00Z", rowCount: 16 }] : [];
       else if (url.pathname === "/api/portfolios/" + snapshot.id) body = snapshot;
       else legacyRequests.push(url.pathname);
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
@@ -49,10 +50,12 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE_PATH || "playwright")
     assert.equal(await page.getByRole("heading", { name: "Bank capital", exact: true }).isVisible(), false);
 
     await page.getByRole("button", { name: "Upload portfolio", exact: true }).click();
+    await page.getByLabel("Portfolio name", { exact: true }).fill(portfolioName);
     const picker = page.locator('input[type="file"]').first();
     await picker.setInputFiles(path.join(__dirname, "../frontend/public/portfolio-loans-19.csv"));
     await page.getByRole("button", { name: "Saved portfolios", exact: true }).click();
     await page.getByRole("button", { name: "Upload portfolio", exact: true }).click();
+    assert.equal(await page.getByLabel("Portfolio name", { exact: true }).inputValue(), portfolioName, "Navigation must retain the portfolio name");
     assert.equal(await picker.evaluate(el => el.files.length), 1, "Navigation must retain the chosen file");
     await page.getByRole("checkbox", { name: "I confirm this file contains synthetic data only." }).check();
     await page.getByRole("button", { name: "Validate file", exact: true }).click();
@@ -61,8 +64,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE_PATH || "playwright")
     await page.getByRole("table", { name: "Reported bank loan values from this immutable portfolio" }).waitFor();
     assert.equal(await page.getByRole("button", { name: /Saved portfolios/ }).getAttribute("aria-pressed"), "true");
     assert.equal(await page.locator("tbody tr:visible").count(), 16);
+    assert.match(await page.locator('select option[value="synthetic-portfolio-1"]').innerText(), /September Demo Portfolio · ID syntheti/);
+    await page.getByText("September Demo Portfolio · ID synthetic-portfolio-1", { exact: false }).waitFor();
 
     await page.getByRole("button", { name: "Upload portfolio", exact: true }).click();
+    assert.equal(await page.getByLabel("Portfolio name", { exact: true }).inputValue(), "", "Save clears the next upload name");
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "Mobile layout must not overflow");
 

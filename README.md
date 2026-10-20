@@ -2,6 +2,8 @@
 
 Synthetic-data prototype for collecting bank-to-NBFC lending reports and reviewing saved loan figures.
 
+API explorer: [Swagger UI URLs and usage](docs/runbook.md#swagger-ui-and-openapi-20-october-2026). After restarting the backend, open http://localhost:8090/swagger-ui/index.html to choose a business service.
+
 ## Current handover
 
 Branch: `feature/saved-report-review`

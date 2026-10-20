@@ -37,7 +37,7 @@ foreach ($portfolio in $data.portfolios) {
     $date=$portfolio.reportingDate
     if (-not $state.portfolios.ContainsKey($date)) {
         $file=Get-Item -LiteralPath (Join-Path $PSScriptRoot $portfolio.file)
-        $saved=Invoke-RestMethod -Uri "$BaseUrl/api/portfolios" -Method Post -Headers @{'X-Demo-Role'='CONTRIBUTOR'} -Form @{file=$file;synthetic='true'}
+        $saved=Invoke-RestMethod -Uri "$BaseUrl/api/portfolios" -Method Post -Headers @{'X-Demo-Role'='CONTRIBUTOR'} -Form @{file=$file;synthetic='true';name=('Demo portfolio — '+$date)}
         if ($saved.status -ne 'APPROVED') { throw "Portfolio $date was not approved." }
         $state.portfolios[$date]=$saved.id; Save-State
     }

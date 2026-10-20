@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Review and audit",description="Assessments, supervisor decisions, follow-up actions, evidence and audit history.")
 @RestController
 @RequestMapping("/api/governance")
 public class GovernanceController {
