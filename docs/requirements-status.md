@@ -42,3 +42,8 @@ The Phase 0 proposal, client Q&A and agreed workflow documents were not availabl
 - Frontend TypeScript compilation and Vite production build pass.
 - Oracle migration execution, Kafka startup and end-to-end browser execution still require local verification.
 
+
+
+## User-requested reviewed workflow, 22 October 2026
+
+The current user explicitly requested initial Supervisor confirmation of contributor data before analyst calculations. This supersedes automatic approval of warning-free new contributor inputs. Contributor save creates PENDING_REVIEW; authorized Supervisor approval/return is recorded separately, with analyst access blocked until approval. Final scenario assessment approval remains separate and is required for PDF export. Details and verification: [workflow handover](workflow-reset-and-handover.md).

@@ -101,6 +101,11 @@ class GovernanceAuthorizationTest {
         verifyNoInteractions(service);
     }
 
+    @Test void analystStatusLookupIsScopedToTheSignedInAccount() throws Exception {
+        mvc.perform(get("/api/governance/my-assessments").with(signedIn("ANALYST"))).andExpect(status().isOk());
+        verify(assessments).findTop100BySubmittedByOrderBySubmittedAtDesc(USER_ID);
+        verify(assessments,never()).findTop100ByOrderBySubmittedAtDesc();
+    }
     private static RequestPostProcessor signedIn(String role) {
         var principal = new WorkbenchPrincipal(
                 USER_ID,

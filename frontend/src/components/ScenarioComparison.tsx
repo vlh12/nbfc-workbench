@@ -1,3 +1,4 @@
+import { entryLabel, scenarioName } from "../workflowLabels";
 import { portfolioDetails } from "../portfolioLabels";
 import { useState } from "react";
 import { moneyCents, moneyLabel } from "../dashboardMetrics";
@@ -20,7 +21,7 @@ export function ScenarioComparison({ runs, entries, bankId, nbfcId, loaded, load
   const shown = (value?: string) => value || "Not recorded";
   const money = (value?: string) => value == null ? "Not recorded" : moneyLabel(moneyCents(value));
   const fields: [string, (run: AnalysisScenario) => string][] = [
-    ["Run ID", r => r.id], ["Created", r => new Date(r.createdAt).toLocaleString("en-IN")],
+    ["Scenario name", r => scenarioName(r)], ["Created", r => new Date(r.createdAt).toLocaleString("en-IN")],
     ["Reporting date", r => entries.find(e => e.id === r.snapshotId)?.reportingDate || "Not in loaded inputs"],
     ["Portfolio name / ID", r => portfolioDetails(entries.find(e => e.id === r.snapshotId) || { id: r.snapshotId })], ["Model", r => shown(r.modelVersion)],
     ["Severity", r => scenarioRate(r, "severityPct") == null ? "Not recorded" : scenarioRate(r, "severityPct") + "%"],
@@ -28,8 +29,8 @@ export function ScenarioComparison({ runs, entries, bankId, nbfcId, loaded, load
     ["Explicit EAD", r => money(r.result?.eadAmount)], ["Eligible capital", r => money(r.result?.eligibleCapital)],
     ["Capital definition", r => shown(r.result?.capitalLabel)], ["Direct loss", r => money(r.result?.stressedLoss)],
     ["Capital impact", r => r.result!.capitalImpactPct + "%"], ["Alert", r => r.result!.alertSeverity],
-    ["Capital version", r => shown(r.inputs?.capitalId)], ["Asset-quality version", r => shown(r.inputs?.qualityId)],
-    ["Threshold version", r => shown(r.result?.thresholdVersion)],
+    ["Capital version", r => entries.find(e=>e.id===r.inputs?.capitalId)?.name || "Bank capital - saved reference in evidence"], ["Asset-quality version", r => entries.find(e=>e.id===r.inputs?.qualityId)?.name || "Asset quality - saved reference in evidence"],
+    ["Threshold version", r => entries.find(e=>e.id===r.result?.thresholdVersion)?.name || "Saved alert thresholds"],
     ["Threshold settings", r => "MEDIUM ≥ " + r.result!.mediumPct + "% · HIGH ≥ " + r.result!.highPct + "%"],
     ["Rationale", r => shown(r.inputs?.rationale)],
   ];
@@ -37,7 +38,7 @@ export function ScenarioComparison({ runs, entries, bankId, nbfcId, loaded, load
     <div><h4 className="font-semibold">Saved scenario comparison</h4><p className="mt-1 text-sm text-slate-600">{nbfcId} · Compare completed saved runs. Baseline, Moderate and Severe are comparison labels you assign here; saved records stay unchanged.</p><p className="mt-1 text-xs text-slate-500">Candidates come from the latest 100 loaded runs for the same bank and NBFC. Different portfolio, capital, context, threshold and model versions are flagged.</p></div>
     {loadError && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">Saved scenarios are unavailable. Retry when Stress Simulation is available.</p>}
     {!loaded && !loadError && <p className="text-sm text-slate-500">Loading saved scenarios…</p>}
-    <div className="grid gap-3 sm:grid-cols-3">{labels.map((label, index) => <label key={label}>{label} saved scenario<select className={input} disabled={!loaded || loadError} value={ids[index]} onChange={e => { setIds(old => old.map((value, i) => i === index ? e.target.value : value)); setCompared(null); setError(""); }}><option value="">{index ? "Optional" : "Select baseline"}</option>{candidates.map(run => <option key={run.id} value={run.id} disabled={ids.some((id, i) => i !== index && id === run.id)}>{run.id.slice(0, 8)} · Severity {scenarioRate(run, "severityPct") ?? "?"}% / Recovery {scenarioRate(run, "recoveryPct") ?? "?"}% · {run.result!.alertSeverity}</option>)}</select></label>)}</div>
+    <div className="grid gap-3 sm:grid-cols-3">{labels.map((label, index) => <label key={label}>{label} saved scenario<select className={input} disabled={!loaded || loadError} value={ids[index]} onChange={e => { setIds(old => old.map((value, i) => i === index ? e.target.value : value)); setCompared(null); setError(""); }}><option value="">{index ? "Optional" : "Select baseline"}</option>{candidates.map(run => <option key={run.id} value={run.id} disabled={ids.some((id, i) => i !== index && id === run.id)}>{scenarioName(run)} · Severity {scenarioRate(run, "severityPct") ?? "?"}% / Recovery {scenarioRate(run, "recoveryPct") ?? "?"}% · {run.result!.alertSeverity}</option>)}</select></label>)}</div>
     <Button disabled={!loaded || loadError} onClick={compare}>Compare saved scenarios</Button>
     {loaded && !loadError && candidates.length < 2 && <p className="text-sm text-slate-500">Save at least two completed scenarios for this NBFC to compare different assumptions.</p>}
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">{error}</p>}

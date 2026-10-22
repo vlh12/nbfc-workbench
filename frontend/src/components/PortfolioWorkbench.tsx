@@ -1,4 +1,7 @@
+import { SubmissionStatus } from "./SubmissionStatus";
 import { DashboardOverview, ScenarioBrowser, ReportsPanel, UserGuide, AssessmentList } from "./RiskDashboard";
+import { DataReviewPanel } from "./DataReviewPanel";
+import { entryLabel, scenarioName } from "../workflowLabels";
 import { Icon } from "./WorkbenchShell";
 import type { WorkspaceView } from "../workspace";
 import { exportPortfolioReport } from "../reportExport";
@@ -48,6 +51,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
   const [entries, setEntries] = useState<Entry[]>([]), [selected, setSelected] = useState("");
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null), [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [busy, setBusy] = useState(false);
+  const [inputReviews,setInputReviews]=useState<{id:string;decision:string;reviewNote:string;reviewedAt:string}[]>([]);
   const [portfolioName, setPortfolioName] = useState("");
   const [file, setFile] = useState<File | null>(null), [synthetic, setSynthetic] = useState(false);
   const [validation, setValidation] = useState<Validation | null>(null);
@@ -59,6 +63,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
   const [savedThreshold, setSavedThreshold] = useState<{ id: string; name: string; mediumPct: string; highPct: string } | null>(null);
 
   const [nbfc, setNbfc] = useState(""), [capitalId, setCapitalId] = useState(""), [qualityId, setQualityId] = useState(""), [thresholdId, setThresholdId] = useState("");
+  const [scenarioNameInput,setScenarioNameInput] = useState("");
   const [severity, setSeverity] = useState(""), [recovery, setRecovery] = useState(""), [rationale, setRationale] = useState("");
   const [runs, setRuns] = useState<Run[]>([]), [currentRun, setCurrentRun] = useState<Run | null>(null), [assessmentNote, setAssessmentNote] = useState("");
   const [qualityCurrent, setQualityCurrent] = useState(""), [qualityPrior, setQualityPrior] = useState(""), [trend, setTrend] = useState<{ current: Quality; prior: Quality | null } | null>(null);
@@ -67,7 +72,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
   const [trendError, setTrendError] = useState(""), [trendLoading, setTrendLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    try { const rows = await api<Entry[]>("/api/portfolios"); setEntries(rows); setSelected(old => old || rows.find(e => e.kind === "PORTFOLIO" && e.status !== "VALIDATION_FAILED")?.id || ""); }
+    try { const rows = await api<Entry[]>("/api/portfolios"); setEntries(rows); setSelected(old => old || rows.find(e => e.kind === "PORTFOLIO" && e.status === "APPROVED")?.id || rows.find(e => e.kind === "PORTFOLIO" && e.status !== "VALIDATION_FAILED")?.id || ""); }
     catch (e) { setError(errorMessage(e)); }
   }, []);
   useEffect(() => { void refresh(); const timer = window.setInterval(() => void refresh(), 5000); return () => clearInterval(timer); }, [refresh]);
@@ -77,7 +82,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     void api<Snapshot>("/api/portfolios/" + selected).then(s => { if (live) { setSnapshot(s); setDate(s.reportingDate); setNbfc(s.rows[0]?.nbfcId || ""); } }).catch(e => { if (live) setError(errorMessage(e)); });
     if (reviewer) void api<Analysis>("/api/exposures/portfolios/" + selected).then(a => { if (live) { setAnalysis(a); setLastUpdated(new Date().toLocaleTimeString("en-IN")); } }).catch(e => { if (live) setError(errorMessage(e)); });
     return () => { live = false; };
-  }, [selected, reviewer, refreshTick]);
+  }, [selected, reviewer, refreshTick, entries.find(e=>e.id===selected)?.status]);
   useEffect(() => {
     if (!reviewer) return;
     const load = () => { void api<Run[]>("/api/scenarios").then(rows => { setRuns(rows); setRunsLoaded(true); setRunsError(false); }).catch(() => { setRunsError(true); }); };
@@ -93,7 +98,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
   }
   async function saveFile() {
     if (!file || !synthetic || !portfolioName.trim() || !validation || validation.errors.length) return;
-    await perform(async () => { const data = new FormData(); data.set("file", file); data.set("synthetic", "true"); data.set("name", portfolioName.trim()); const s = await api<Snapshot>("/api/portfolios", { method: "POST", body: data }); setSelected(s.id); setReportingPeriod(s.reportingDate); setValidation(null); setFile(null); setPortfolioName(""); setContributorView("saved"); }, "Portfolio saved. Analyst and supervisor can now select this snapshot.");
+    await perform(async () => { const data = new FormData(); data.set("file", file); data.set("synthetic", "true"); data.set("name", portfolioName.trim()); const s = await api<Snapshot>("/api/portfolios", { method: "POST", body: data }); setSelected(s.id); setReportingPeriod(s.reportingDate); setValidation(null); setFile(null); setPortfolioName(""); setContributorView("saved"); }, "Portfolio saved for Supervisor review. Add matching capital and asset quality. Analyst access begins after approval.");
   }
   const post = (path: string, data: unknown) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
   async function saveThreshold(event: FormEvent) {
@@ -109,7 +114,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     finally { setBusy(false); }
   }
 
-  function optionList(kind: string) { return entries.filter(e => e.kind === kind && e.status !== "VALIDATION_FAILED" && (kind !== "PORTFOLIO" || !reportingPeriod || e.reportingDate === reportingPeriod)).map(e => <option key={e.id} value={e.id}>{kind === "PORTFOLIO" ? portfolioLabel(e) : `${e.reportingDate || kind} · ${e.id.slice(0, 8)} · ${e.status}`}</option>); }
+  function optionList(kind: string) { return entries.filter(e => e.kind === kind && e.status !== "VALIDATION_FAILED" && (kind !== "PORTFOLIO" || !reportingPeriod || e.reportingDate === reportingPeriod) && (!reviewer || kind === "PORTFOLIO" || e.status === "APPROVED")).map(e => <option key={e.id} value={e.id}>{kind === "PORTFOLIO" ? portfolioLabel(e) : entryLabel(e)}</option>); }
   const nbfcIds = [...new Set(snapshot?.rows.map(l => l.nbfcId) || [])];
   async function loadTrend() {
     setTrendLoading(true); setTrendError(""); setTrend(null);
@@ -121,17 +126,19 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     } catch (e) { setTrendError(errorMessage(e)); }
     finally { setTrendLoading(false); }
   }
+  useEffect(()=>{let live=true;setInputReviews([]);if(selected&&contributor)void api<typeof inputReviews>("/api/portfolios/"+selected+"/reviews").then(rows=>{if(live)setInputReviews(rows)}).catch(()=>{});return()=>{live=false}},[selected,contributor,entries.find(e=>e.id===selected)?.status]);
   const activeSnapshot = snapshot?.id === selected ? snapshot : null;
   const activeAnalysis = analysis?.snapshotId === selected ? analysis : null;
   const openRun = (run: Run) => { setCurrentRun(run); navigate("history"); };
   useEffect(()=>{if(view==="history" && currentRun) document.getElementById("saved-scenario-result")?.scrollIntoView({block:"start"});},[view,currentRun]);
   return <section className="space-y-5" aria-label="Portfolio workspace">
+    <p className="rounded border border-blue-100 bg-blue-50 p-3 text-sm" aria-label="Workflow guidance">{contributor ? "Validate and save your portfolio, then add matching capital and asset quality. The Supervisor reviews each input before analyst use." : supervisor ? "First approve contributor inputs under Review & Follow-up. Later, review the analyst assessment. Final scenario approval unlocks the PDF." : "Only Supervisor-approved inputs appear here. Select matching portfolio, capital and asset quality, calculate a named scenario, then submit it for final review."}</p>
     <div className="portfolio-toolbar">
       <label className="bank-filter">Bank<select aria-label="Bank"><option>Synthetic Demo Bank (SYN-BANK-001)</option></select></label>
       <label className="period-filter">Reporting period<select aria-label="Reporting period" value={reportingPeriod} onChange={e=>{ const period=e.target.value; setReportingPeriod(period); if(period && snapshot?.reportingDate!==period){setSelected(entries.find(row=>row.kind==="PORTFOLIO" && row.status!=="VALIDATION_FAILED" && row.reportingDate===period)?.id || "");setCurrentRun(null);} }}><option value="">All reporting dates</option>{[...new Set(entries.filter(row=>row.kind==="PORTFOLIO" && row.status!=="VALIDATION_FAILED" && row.reportingDate).map(row=>row.reportingDate!))].sort().reverse().map(period=><option key={period}>{period}</option>)}</select></label>
       <label className="portfolio-filter">Portfolio<select aria-label="Portfolio" className={input} value={selected} onChange={e => { setSelected(e.target.value); setCurrentRun(null); }}><option value="">Select a saved portfolio</option>{optionList("PORTFOLIO")}</select></label>
       <button type="button" className="icon-button" aria-label="Refresh workspace data" onClick={()=>{ setError(""); void refresh(); setRefreshTick(t=>t+1); }}><Icon name="refresh"/></button>
-      {reviewer && <button type="button" className="report-button" disabled={!activeSnapshot} onClick={()=>activeSnapshot && exportPortfolioReport(activeSnapshot,runs)}><Icon name="download" size={16}/>Export Report</button>}
+      {reviewer && <button type="button" className="report-button" disabled={!activeSnapshot} onClick={()=>navigate("reports")}><Icon name="download" size={16}/>Export Report</button>}
     </div>
     {view==="dashboard" && reviewer && <DashboardOverview snapshot={activeSnapshot} analysis={activeAnalysis} runs={runs} runsLoaded={runsLoaded} runsError={runsError} currentRun={currentRun} entries={entries} updated={lastUpdated} navigate={navigate} openRun={openRun} openNbfc={id=>{setAnalysisNbfc(id);navigate("analysis");}} />}
     {(view==="history" || view==="alerts") && reviewer && <ScenarioBrowser key={view} snapshot={activeSnapshot} runs={runs} loaded={runsLoaded} error={runsError} alertsOnly={view==="alerts"} openRun={openRun} />}
@@ -151,6 +158,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
       </nav>
     </> : <h2 id="portfolio-title" className="sr-only">Portfolio risk workbench</h2>}
     </div>
+    {supervisor && show("assessments","data") && <DataReviewPanel entries={entries} onChanged={()=>{void refresh();setRefreshTick(t=>t+1)}} />}
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">{error}</p>}
     {notice && <p role="status" className="rounded bg-teal-50 p-3 text-teal-900">{notice}</p>}
     <div hidden={!show("data")} className="tool-section">
@@ -166,6 +174,8 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
 
       {!snapshot ? <p className="mt-3 text-sm text-slate-500">Upload and save a portfolio to begin.</p> : <>
         <p className="my-3 break-words text-sm">{portfolioDetails(snapshot)} · {snapshot.bankId} · {snapshot.reportingDate} · {snapshot.status} · {snapshot.rows.length} loans · {nbfcIds.length} NBFCs</p>
+        {contributor&&<p className="rounded bg-blue-50 p-3">{entries.find(e=>e.id===selected)?.status==="APPROVED"?"Supervisor approved this data. It is available to the analyst.":entries.find(e=>e.id===selected)?.status==="RETURNED"?"Supervisor returned this data. Upload a corrected version with a new name.":"Waiting for Supervisor data review. Add matching capital and asset quality under Supporting data."}</p>}
+        {contributor&&inputReviews.map(event=><p key={event.id}>{event.decision} · {new Date(event.reviewedAt).toLocaleString("en-IN")} · {event.reviewNote}</p>)}
         {snapshot.warnings.length > 0 && <details className="mb-4 rounded bg-amber-50 p-3"><summary className="cursor-pointer">Data reconciliation warnings ({snapshot.warnings.length})</summary>{snapshot.warnings.map((w, i) => <p className="mt-2 text-sm" key={i}>Line {w.line} · {w.field}: {w.message}</p>)}</details>}
         <div className="overflow-auto"><table className="w-full text-left text-sm"><caption className="sr-only">Reported bank loan values from this immutable portfolio</caption><thead><tr><th>NBFC / loan</th><th>Amount lent</th><th>Outstanding</th><th>Explicit EAD</th><th>DPD / status</th></tr></thead><tbody>{snapshot.rows.map(l => <tr key={l.loanId} className="border-t"><td className="py-3">{l.nbfcId}<br />{l.loanId}</td><td>{rupees(l.amountLent)}</td><td>{rupees(l.outstandingAmount)}</td><td>{rupees(l.eadAmount)}</td><td>{l.dpdDays} / {l.loanStatus}</td></tr>)}</tbody></table></div>
         <p className="mt-3 text-xs text-slate-500">Loan DPD describes these bank-held loans. It is not the NBFC's own borrower-portfolio asset quality. Row-level reported revenue is preserved and is not summed as company revenue.</p>
@@ -190,6 +200,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     </div>
     <div hidden={!show("data")} className="tool-section">
     {contributor && <div hidden={contributorView!=="support"} className="space-y-4">
+      <SubmissionStatus entries={entries} />
       <div><h3 className="text-lg font-semibold">Supporting data</h3><p className="mt-1 text-sm text-slate-500">Add these inputs when preparing a stress analysis. Your portfolio upload is saved separately.</p></div>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Supporting data type">{([["capital","Bank capital"],["quality","NBFC asset quality"]] as const).map(([view,label])=><button type="button" key={view} aria-pressed={supportView===view} disabled={busy} onClick={()=>setSupportView(view)} className={"rounded-lg border px-4 py-2 text-sm font-medium "+(supportView===view?"border-teal-700 bg-teal-50 text-teal-900":"border-slate-200 bg-white text-slate-600")}>{label}</button>)}</div>
       <form hidden={supportView!=="capital"} className={box+" max-w-2xl"} onSubmit={e => { e.preventDefault(); void perform(() => post("/api/portfolios/capital", { bankId: "SYN-BANK-001", reportingDate: date, eligibleCapital: capital, label: capitalLabel }), "Capital version saved."); }}>
@@ -229,11 +240,11 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     <div hidden={!show("analysis", "stress")} className="tool-section">
     {reviewer && <div className={box}>
       <h3 className="font-bold">Approved NBFC asset-quality context</h3>
-      <div className="my-3 grid gap-3 sm:grid-cols-2"><label>Current snapshot<select className={input} disabled={trendLoading} value={qualityCurrent} onChange={e => { setQualityCurrent(e.target.value); setQualityPrior(""); setTrend(null); setTrendError(""); }}><option value="">Select</option>{optionList("QUALITY")}</select></label><label>Prior period (optional)<select className={input} disabled={trendLoading || !qualityCurrent} value={qualityPrior} onChange={e => { setQualityPrior(e.target.value); setTrend(null); setTrendError(""); }}><option value="">No comparison</option>{entries.filter(e => e.kind === "QUALITY" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id} disabled={!e.reportingDate || e.reportingDate >= (entries.find(c => c.id === qualityCurrent)?.reportingDate || "")}>{e.reportingDate} · {e.id.slice(0, 8)} · {e.status}</option>)}</select></label></div>
+      <div className="my-3 grid gap-3 sm:grid-cols-2"><label>Current snapshot<select className={input} disabled={trendLoading} value={qualityCurrent} onChange={e => { setQualityCurrent(e.target.value); setQualityPrior(""); setTrend(null); setTrendError(""); }}><option value="">Select</option>{optionList("QUALITY")}</select></label><label>Prior period (optional)<select className={input} disabled={trendLoading || !qualityCurrent} value={qualityPrior} onChange={e => { setQualityPrior(e.target.value); setTrend(null); setTrendError(""); }}><option value="">No comparison</option>{entries.filter(e => e.kind === "QUALITY" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id} disabled={!e.reportingDate || e.reportingDate >= (entries.find(c => c.id === qualityCurrent)?.reportingDate || "")}>{entryLabel(e)}</option>)}</select></label></div>
       <p className="mb-3 text-sm text-slate-500">Choose No comparison to view current amounts only. A prior snapshot must be earlier and belong to the same NBFC.</p>
       <Button disabled={busy || trendLoading || !qualityCurrent} onClick={() => void loadTrend()}>{trendLoading ? "Loading asset-quality trend…" : "View asset-quality trend"}</Button>
       {trendError && <p role="alert" className="mt-3 rounded bg-red-50 p-3 text-red-900">{trendError}</p>}
-      {trend && <div className="mt-4"><DoughnutChart title="NBFC asset-quality mix" subtitle={trend.current.nbfcId + " · " + trend.current.reportingDate + " · Version " + qualityCurrent.slice(0, 8) + " · Current snapshot only"} slices={buckets.map(name => ({ name, amount: moneyCents(trend.current.buckets[name]) }))} emptyMessage="All asset-quality buckets are zero; no distribution to display." /></div>}
+      {trend && <div className="mt-4"><DoughnutChart title="NBFC asset-quality mix" subtitle={trend.current.nbfcId + " · " + trend.current.reportingDate + " · " + (entries.find(e=>e.id===qualityCurrent)?.name || "Asset quality") + " · Current snapshot only"} slices={buckets.map(name => ({ name, amount: moneyCents(trend.current.buckets[name]) }))} emptyMessage="All asset-quality buckets are zero; no distribution to display." /></div>}
       {trend && <NpaHistoryChart bankId={trend.current.bankId} nbfcId={trend.current.nbfcId} entries={entries} />}
       {trend && <div role="region" aria-label="Asset-quality trend results" className="mt-4 overflow-auto"><p>{trend.current.nbfcId} · {trend.current.reportingDate}{trend.prior ? " vs " + trend.prior.reportingDate : ""}</p><table className="mt-3 w-full text-left text-sm"><thead><tr><th>Bucket</th><th>Current</th><th>Prior</th><th>Change INR</th></tr></thead><tbody>{buckets.map(b => <tr className="border-t" key={b}><td className="py-2">{b}</td><td>{rupees(trend.current.buckets[b])}</td><td>{trend.prior ? rupees(trend.prior.buckets[b]) : "Not supplied"}</td><td>{trend.prior ? delta(trend.current.buckets[b], trend.prior.buckets[b]) : "Not supplied"}</td></tr>)}</tbody></table></div>}
     </div>}
@@ -244,7 +255,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     <div hidden={!show("stress")} className="tool-section">
     {analyst && <form className={box} onSubmit={e => {
       e.preventDefault();
-      void perform(async () => { const run = await api<Run>("/api/scenarios", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ snapshotId: selected, nbfcId: nbfc, capitalId, qualityId, thresholdId, severityPct: severity, recoveryPct: recovery, rationale, idempotencyKey: crypto.randomUUID() }) }); setCurrentRun(run); setRuns(old => [run, ...old]); }, "Scenario stored. Review the result or failure reason below.");
+      void perform(async () => { const run = await api<Run>("/api/scenarios", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: scenarioNameInput.trim(), snapshotId: selected, nbfcId: nbfc, capitalId, qualityId, thresholdId, severityPct: severity, recoveryPct: recovery, rationale, idempotencyKey: crypto.randomUUID() }) }); setCurrentRun(run); setRuns(old => [run, ...old]); }, "Scenario stored. Review the result or failure reason below.");
     }}>
       <h3 className="text-lg font-bold">Run one-NBFC stress scenario</h3>
       <p className="mt-2 text-sm">Requires approved explicit EAD, matching capital and asset-quality dates, rationale and a saved threshold version. DPD never sets severity automatically.</p>
@@ -256,19 +267,20 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
         <label>Severity (%)<input className={input} type="number" min="0" max="100" step="0.01" required value={severity} onChange={e => setSeverity(e.target.value)} /></label>
         <label>Recovery (%)<input className={input} type="number" min="0" max="100" step="0.01" required value={recovery} onChange={e => setRecovery(e.target.value)} /></label>
       </div>
+      <label>Scenario name<input className={input} required maxLength={120} placeholder="September - Moderate stress - NBFC 001" value={scenarioNameInput} onChange={e=>setScenarioNameInput(e.target.value)} /></label>
       <label>Scenario rationale<textarea className={input} maxLength={2000} required value={rationale} onChange={e => setRationale(e.target.value)} /></label>
-      <Button className="mt-3" disabled={busy || !snapshot}>Calculate and save scenario</Button>
+      <Button className="mt-3" disabled={busy || !snapshot || snapshot.status!=="APPROVED"}>Calculate and save scenario</Button>
     </form>}
     </div>
     <div hidden={!show("history", "stress", "assessments")} className="tool-section">
     {reviewer && <div className={box}>
       <h3 id="saved-scenario-result" className="font-bold scroll-mt-6">Saved scenarios and explainable alerts</h3>
-      <select aria-label="Saved scenario" className={input} value={currentRun?.id || ""} onChange={e => setCurrentRun(runs.find(r => r.id === e.target.value) || null)}><option value="">Select a scenario</option>{runs.map(r => <option key={r.id} value={r.id}>{r.nbfcId} · {r.status} · {r.id.slice(0, 8)}</option>)}</select>
+      <select aria-label="Saved scenario" className={input} value={currentRun?.id || ""} onChange={e => setCurrentRun(runs.find(r => r.id === e.target.value) || null)}><option value="">Select a scenario</option>{runs.map(r => <option key={r.id} value={r.id}>{scenarioName(r)} · {r.status} · {new Date(r.createdAt).toLocaleString("en-IN")}</option>)}</select>
       {currentRun && <div className="mt-4 space-y-3"><p>{currentRun.status} · Portfolio {portfolioDetails(entries.find(e => e.id === currentRun.snapshotId) || { id: currentRun.snapshotId })}</p>
         {currentRun.failureReason && <p role="alert" className="rounded bg-amber-50 p-3">{currentRun.failureReason} No final alert published.</p>}
         {currentRun.result && <><div className="grid gap-3 sm:grid-cols-3"><p>Direct loss<br /><strong>{rupees(currentRun.result.stressedLoss)}</strong></p><p>Capital impact<br /><strong>{currentRun.result.capitalImpactPct}%</strong></p><p>Prototype alert<br /><strong>{currentRun.result.alertSeverity}</strong></p></div>
           <p>EAD {rupees(currentRun.result.eadAmount)} · {currentRun.result.capitalLabel}: {rupees(currentRun.result.eligibleCapital)} · EAD / capital: {currentRun.result.concentrationCapitalPct}%</p>
-          <p className="text-sm">{currentRun.result.formula}</p><p className="text-xs">Threshold version: {currentRun.result.thresholdVersion} · MEDIUM ≥ {currentRun.result.mediumPct}% · HIGH ≥ {currentRun.result.highPct}%</p>
+          <p className="text-sm">{currentRun.result.formula}</p><p className="text-xs">Threshold: {entries.find(e=>e.id===currentRun.result?.thresholdVersion)?.name || "Saved alert thresholds"} · MEDIUM ≥ {currentRun.result.mediumPct}% · HIGH ≥ {currentRun.result.highPct}%</p>
           {analyst && <div><label>Assessment note<textarea className={input} maxLength={2000} value={assessmentNote} onChange={e => setAssessmentNote(e.target.value)} /></label><Button className="mt-3" disabled={busy || !assessmentNote.trim()} onClick={() => void perform(() => post("/api/governance/scenario-assessments", { scenarioId: currentRun.id, note: assessmentNote }), "Assessment submitted to the supervisor queue.")}>Submit scenario for supervisor review</Button></div>}
         </>}
       </div>}

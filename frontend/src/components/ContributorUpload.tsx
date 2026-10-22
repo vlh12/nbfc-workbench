@@ -35,7 +35,7 @@ export function ContributorUpload({ portfolioName, onPortfolioName, file, synthe
     <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_230px]">
       <form onSubmit={onValidate} className="min-w-0 space-y-4">
         <label className="block text-sm font-medium text-slate-800">Portfolio name<input type="text" required maxLength={120} disabled={busy} value={portfolioName} onChange={e => onPortfolioName(e.target.value)} placeholder="September 2026 Exposure Portfolio" aria-describedby="portfolio-name-help" className="mt-2 block w-full rounded-lg border border-slate-300 bg-white p-3 text-sm" /></label>
-        <p id="portfolio-name-help" className="text-xs text-slate-500">Use a meaningful name. A unique portfolio ID is generated when you save; both name and ID stay visible.</p>
+        <p id="portfolio-name-help" className="text-xs text-slate-500">Use a meaningful name such as September 2026 Exposure Portfolio. Technical references are retained in the report appendix.</p>
         <label className={"block rounded-xl border-2 border-dashed p-6 transition " + (file ? "border-teal-300 bg-teal-50/40" : "border-slate-300 bg-slate-50")}>
           <span className="mb-3 block font-semibold text-slate-800">{file ? "File selected" : "Choose your portfolio CSV"}</span>
           <input ref={picker} type="file" accept=".csv,text/csv" required disabled={busy} onChange={e => onFile(e.target.files?.[0] || null)} className="block w-full min-w-0 text-sm text-slate-600 file:mr-3 file:rounded-lg file:border file:border-slate-200 file:bg-white file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-100" aria-describedby="portfolio-file-help" />
@@ -51,9 +51,9 @@ export function ContributorUpload({ portfolioName, onPortfolioName, file, synthe
       <aside className="rounded-xl bg-slate-50 p-4 text-sm">
         <h4 className="font-semibold text-slate-800">Need a sample?</h4>
         <p className="mt-2 text-xs leading-5 text-slate-500">Use a matching template to prepare your file.</p>
-        <a href="/portfolio-loans-19.csv" download className="mt-4 block font-medium text-teal-800 underline underline-offset-4">Download sample CSV</a>
+        <a href="/workflow-portfolio-september.csv" download className="mt-4 block font-medium text-teal-800 underline underline-offset-4">Download complete workflow CSV</a>
         <a href="/portfolio-loans-ead-template.csv" download className="mt-3 block font-medium text-teal-800 underline underline-offset-4">Download EAD template</a>
-        <p className="mt-4 text-xs leading-5 text-slate-500">The sample supports portfolio review. Add explicit EAD values for stress analysis.</p>
+        <p className="mt-4 text-xs leading-5 text-slate-500">This sample includes explicit EAD and reconciled September values. Matching supporting-data guides are in samples/workflow-demo.</p>
       </aside>
     </div>
     {validation && <div aria-live="polite" className="border-t border-slate-100 px-5 py-5 sm:px-8">
@@ -63,7 +63,7 @@ export function ContributorUpload({ portfolioName, onPortfolioName, file, synthe
         {validation.errors.length > 0 && <ul className="mt-3 max-h-56 list-disc space-y-2 overflow-auto pl-5 text-sm">{validation.errors.map((issue, i) => <li key={i}>Line {issue.line} - {issue.field}: {issue.message}</li>)}</ul>}
         {validation.warnings.length > 0 && <details className="mt-3"><summary className="cursor-pointer text-sm font-medium">View warnings ({validation.warnings.length})</summary><ul className="mt-3 max-h-56 list-disc space-y-2 overflow-auto pl-5 text-sm">{validation.warnings.map((issue, i) => <li key={i}>Line {issue.line} - {issue.field}: {issue.message}</li>)}</ul></details>}
       </div>
-      {valid && <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="max-w-lg text-sm text-slate-500">Saving makes this portfolio available to the analyst and supervisor.{validation.warnings.length > 0 && " Warnings remain visible and may prevent stress approval."}</p><Button onClick={onSave} disabled={busy || !portfolioName.trim()}>Save portfolio</Button></div>}
+      {valid && <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="max-w-lg text-sm text-slate-500">Saving sends this portfolio for Supervisor review. The analyst receives approved data only.{validation.warnings.length > 0 && " Warnings remain visible and may prevent stress approval."}</p><Button onClick={onSave} disabled={busy || !portfolioName.trim()}>Save portfolio</Button></div>}
     </div>}
   </div>;
 }

@@ -12,5 +12,6 @@ public class PortfolioDocument {
     @Column(name="created_at",nullable=false) public Instant createdAt;
     @Column(name="row_count",nullable=false) public int rowCount;
     @Lob @Column(nullable=false) public String payload;
+    @Version @Column(name="lock_version",nullable=false) public long lockVersion;
     protected PortfolioDocument(){}
 }

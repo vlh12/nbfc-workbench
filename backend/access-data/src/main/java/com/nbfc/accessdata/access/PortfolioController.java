@@ -57,21 +57,29 @@ public class PortfolioController {
         return ResponseEntity.status(201).body(store.save(validation,actor.getName(),body.name()));
     }
     @GetMapping @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
-    public List<Entry> list(){return store.list();}
+    public List<Entry> list(Authentication actor){return store.list().stream().filter(row->!analystOnly(actor)||"APPROVED".equals(row.status())).toList();}
     @GetMapping("/{id}") @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
-    public Snapshot snapshot(@PathVariable String id){return store.get(id,"PORTFOLIO",Snapshot.class);}
+    public Snapshot snapshot(@PathVariable String id,Authentication actor){if(analystOnly(actor))store.requireApproved(id);return store.get(id,"PORTFOLIO",Snapshot.class);}
     @PostMapping("/capital") @PreAuthorize("hasRole('CONTRIBUTOR')")
     public Entry capital(@RequestBody Capital body,Authentication actor){return store.capital(body,actor.getName());}
     @GetMapping("/capital/{id}") @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
-    public Capital capital(@PathVariable String id){return store.get(id,"CAPITAL",Capital.class);}
+    public Capital capital(@PathVariable String id,Authentication actor){if(analystOnly(actor))store.requireApproved(id);return store.get(id,"CAPITAL",Capital.class);}
     @PostMapping("/quality") @PreAuthorize("hasRole('CONTRIBUTOR')")
     public Entry quality(@RequestBody Quality body,Authentication actor){return store.quality(body,actor.getName());}
     @GetMapping("/quality/{id}") @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
-    public Quality quality(@PathVariable String id){return store.get(id,"QUALITY",Quality.class);}
+    public Quality quality(@PathVariable String id,Authentication actor){if(analystOnly(actor))store.requireApproved(id);return store.get(id,"QUALITY",Quality.class);}
     @PostMapping("/thresholds") @PreAuthorize("hasRole('SUPERVISOR')")
     public Entry thresholds(@RequestBody Thresholds body,Authentication actor){return store.thresholds(body,actor.getName());}
     @GetMapping("/thresholds/{id}") @PreAuthorize("hasAnyRole('CONTRIBUTOR','ANALYST','SUPERVISOR')")
-    public Thresholds thresholds(@PathVariable String id){return store.get(id,"THRESHOLDS",Thresholds.class);}
+    public Thresholds thresholds(@PathVariable String id,Authentication actor){if(analystOnly(actor))store.requireApproved(id);return store.get(id,"THRESHOLDS",Thresholds.class);}
+    private boolean analystOnly(Authentication actor){return actor!=null&&actor.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_ANALYST"))&&actor.getAuthorities().stream().noneMatch(a->a.getAuthority().equals("ROLE_SUPERVISOR"));}
+    public record DataDecision(String decision,String note){}
+    @PostMapping("/{id}/review") @PreAuthorize("hasRole('SUPERVISOR')")
+    public Entry review(@PathVariable String id,@RequestBody DataDecision body,Authentication actor){return store.review(id,body.decision(),body.note(),actor.getName());}
+    @GetMapping("/{id}/reviews") @PreAuthorize("hasAnyRole('CONTRIBUTOR','SUPERVISOR')")
+    public List<DataReview> reviews(@PathVariable String id){return store.reviewHistory(id);}
+    @ExceptionHandler(org.springframework.dao.OptimisticLockingFailureException.class)
+    public ResponseEntity<?> conflict(){return ResponseEntity.status(409).body(Map.of("message","Another Supervisor has already reviewed this record. Refresh the queue."));}
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> invalid(IllegalArgumentException e){return ResponseEntity.unprocessableEntity().body(Map.of("message",e.getMessage()));}
     private void checkSynthetic(boolean value){if(!value)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Confirm synthetic data only.");}

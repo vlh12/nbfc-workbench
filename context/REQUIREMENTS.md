@@ -35,3 +35,8 @@ Do not infer growth from unequal/overlapping revenue periods or sum repeat submi
 ## Current increment on 18 October 2026
 
 The supplied Phase 0 proposal has now been reviewed. Contributor multi-NBFC upload, version-selected reviewer analytics, configurable capital/quality/threshold inputs, deterministic stress, immutable scenario evidence and expanded follow-up actions have been implemented. Original no-EAD CSV data is preserved and labelled. Production identity, active-pointer replacement, exclusive queue claims/lead override and full asynchronous scenario lifecycle remain gaps. Live Oracle/browser verification is still pending; see docs/phase0-implementation.md.
+
+
+## User-requested reviewed workflow, 22 October 2026
+
+The current user explicitly requested initial Supervisor confirmation of contributor data before analyst calculations. This supersedes automatic approval of warning-free new contributor inputs. Contributor save creates PENDING_REVIEW; authorized Supervisor approval/return is recorded separately, with analyst access blocked until approval. Final scenario assessment approval remains separate and is required for PDF export. Details and verification: [workflow handover](../docs/workflow-reset-and-handover.md).

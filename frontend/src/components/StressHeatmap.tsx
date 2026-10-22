@@ -1,3 +1,4 @@
+import { entryLabel, scenarioName } from "../workflowLabels";
 import { portfolioDetails } from "../portfolioLabels";
 import { useState } from "react";
 import { api } from "../auth";
@@ -5,7 +6,7 @@ import { moneyCents, moneyLabel } from "../dashboardMetrics";
 import { stressPreview } from "../riskExploration";
 import { Button } from "./ui/button";
 
-type Entry = { id: string; kind: string; reportingDate: string | null; status: string };
+type Entry = { name?: string | null; id: string; kind: string; reportingDate: string | null; status: string };
 type Portfolio = { name?: string | null; id: string; bankId: string; reportingDate: string; status: string; rows: { nbfcId: string; eadAmount: string | null }[] };
 type Preview = { cells: ReturnType<typeof stressPreview>[]; ead: string; capital: string; capitalLabel: string; medium: string; high: string; nbfc: string; capitalId: string; thresholdId: string };
 const steps = [0, 20, 40, 60, 80, 100];
@@ -41,8 +42,8 @@ export function StressHeatmap({ snapshot, entries }: { snapshot: Portfolio; entr
     <div><h3 className="text-lg font-bold">Severity–recovery heatmap</h3><p className="mt-1 text-sm text-slate-600">Explore capital impact using the existing direct-loss model. Preview only: no scenario or alert is saved.</p><p className="mt-1 break-words text-xs text-slate-500">Portfolio {portfolioDetails(snapshot)} · {snapshot.reportingDate} · INR</p></div>
     <div className="grid gap-3 sm:grid-cols-3">
       <label>Heatmap NBFC<select className={input} disabled={loading} value={nbfc} onChange={e => { setNbfc(e.target.value); clear(); }}><option value="">Select</option>{nbfcs.map(id => <option key={id}>{id}</option>)}</select></label>
-      <label>Heatmap capital version<select className={input} disabled={loading} value={capitalId} onChange={e => { setCapitalId(e.target.value); clear(); }}><option value="">Select</option>{entries.filter(e => e.kind === "CAPITAL" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id}>{e.reportingDate} · {e.id.slice(0, 8)}</option>)}</select></label>
-      <label>Heatmap threshold version<select className={input} disabled={loading} value={thresholdId} onChange={e => { setThresholdId(e.target.value); clear(); }}><option value="">Select</option>{entries.filter(e => e.kind === "THRESHOLDS" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id}>{e.id.slice(0, 8)} · APPROVED</option>)}</select></label>
+      <label>Heatmap capital version<select className={input} disabled={loading} value={capitalId} onChange={e => { setCapitalId(e.target.value); clear(); }}><option value="">Select</option>{entries.filter(e => e.kind === "CAPITAL" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id}>{entryLabel(e)}</option>)}</select></label>
+      <label>Heatmap threshold version<select className={input} disabled={loading} value={thresholdId} onChange={e => { setThresholdId(e.target.value); clear(); }}><option value="">Select</option>{entries.filter(e => e.kind === "THRESHOLDS" && e.status === "APPROVED").map(e => <option key={e.id} value={e.id}>{entryLabel(e)}</option>)}</select></label>
     </div>
     <Button disabled={loading || !nbfc || !capitalId || !thresholdId} onClick={() => void generate()}>{loading ? "Loading heatmap…" : "Generate heatmap preview"}</Button>
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">{error}</p>}

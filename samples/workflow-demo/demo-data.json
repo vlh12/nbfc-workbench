@@ -1,0 +1,513 @@
+{
+  "packId": "version-3-reviewed-workflow-2026-10-22",
+  "synthetic": true,
+  "bankId": "SYN-BANK-001",
+  "portfolios": [
+    {
+      "reportingDate": "2026-07-31",
+      "file": "portfolios/portfolio-2026-07-31.csv",
+      "name": "2026-07 Monthly Exposure Portfolio"
+    },
+    {
+      "reportingDate": "2026-08-31",
+      "file": "portfolios/portfolio-2026-08-31.csv",
+      "name": "2026-08 Monthly Exposure Portfolio"
+    },
+    {
+      "reportingDate": "2026-09-30",
+      "file": "portfolios/portfolio-2026-09-30.csv",
+      "name": "2026-09 Monthly Exposure Portfolio"
+    }
+  ],
+  "capital": [
+    {
+      "bankId": "SYN-BANK-001",
+      "reportingDate": "2026-07-31",
+      "eligibleCapital": "50000000000.00",
+      "label": "Bank Eligible Capital - 2026-07 - INR 5000 crore"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "reportingDate": "2026-08-31",
+      "eligibleCapital": "50000000000.00",
+      "label": "Bank Eligible Capital - 2026-08 - INR 5000 crore"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "reportingDate": "2026-09-30",
+      "eligibleCapital": "50000000000.00",
+      "label": "Bank Eligible Capital - 2026-09 - INR 5000 crore"
+    }
+  ],
+  "quality": [
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-001",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "69000000000.00",
+        "DPD_1_30": "8000000000.00",
+        "DPD_31_60": "5000000000.00",
+        "DPD_61_90": "3000000000.00",
+        "NPA_90_PLUS": "12000000000.00",
+        "RESTRUCTURED": "2000000000.00",
+        "WRITE_OFF_RECOVERY": "1000000000.00"
+      },
+      "totalAmount": "100000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-002",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "46800000000.00",
+        "DPD_1_30": "4800000000.00",
+        "DPD_31_60": "3000000000.00",
+        "DPD_61_90": "1800000000.00",
+        "NPA_90_PLUS": "1800000000.00",
+        "RESTRUCTURED": "1200000000.00",
+        "WRITE_OFF_RECOVERY": "600000000.00"
+      },
+      "totalAmount": "60000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-003",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "30000000000.00",
+        "DPD_1_30": "3200000000.00",
+        "DPD_31_60": "2000000000.00",
+        "DPD_61_90": "1200000000.00",
+        "NPA_90_PLUS": "2400000000.00",
+        "RESTRUCTURED": "800000000.00",
+        "WRITE_OFF_RECOVERY": "400000000.00"
+      },
+      "totalAmount": "40000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-004",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "23100000000.00",
+        "DPD_1_30": "2400000000.00",
+        "DPD_31_60": "1500000000.00",
+        "DPD_61_90": "900000000.00",
+        "NPA_90_PLUS": "1200000000.00",
+        "RESTRUCTURED": "600000000.00",
+        "WRITE_OFF_RECOVERY": "300000000.00"
+      },
+      "totalAmount": "30000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-005",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "14200000000.00",
+        "DPD_1_30": "1600000000.00",
+        "DPD_31_60": "1000000000.00",
+        "DPD_61_90": "600000000.00",
+        "NPA_90_PLUS": "2000000000.00",
+        "RESTRUCTURED": "400000000.00",
+        "WRITE_OFF_RECOVERY": "200000000.00"
+      },
+      "totalAmount": "20000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-006",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "11400000000.00",
+        "DPD_1_30": "1200000000.00",
+        "DPD_31_60": "750000000.00",
+        "DPD_61_90": "450000000.00",
+        "NPA_90_PLUS": "750000000.00",
+        "RESTRUCTURED": "300000000.00",
+        "WRITE_OFF_RECOVERY": "150000000.00"
+      },
+      "totalAmount": "15000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-007",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "6600000000.00",
+        "DPD_1_30": "800000000.00",
+        "DPD_31_60": "500000000.00",
+        "DPD_61_90": "300000000.00",
+        "NPA_90_PLUS": "1500000000.00",
+        "RESTRUCTURED": "200000000.00",
+        "WRITE_OFF_RECOVERY": "100000000.00"
+      },
+      "totalAmount": "10000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-009",
+      "reportingDate": "2026-07-31",
+      "buckets": {
+        "CURRENT": "5600000000.00",
+        "DPD_1_30": "560000000.00",
+        "DPD_31_60": "350000000.00",
+        "DPD_61_90": "210000000.00",
+        "NPA_90_PLUS": "70000000.00",
+        "RESTRUCTURED": "140000000.00",
+        "WRITE_OFF_RECOVERY": "70000000.00"
+      },
+      "totalAmount": "7000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-001",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "71000000000.00",
+        "DPD_1_30": "8000000000.00",
+        "DPD_31_60": "5000000000.00",
+        "DPD_61_90": "3000000000.00",
+        "NPA_90_PLUS": "10000000000.00",
+        "RESTRUCTURED": "2000000000.00",
+        "WRITE_OFF_RECOVERY": "1000000000.00"
+      },
+      "totalAmount": "100000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-002",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "45600000000.00",
+        "DPD_1_30": "4800000000.00",
+        "DPD_31_60": "3000000000.00",
+        "DPD_61_90": "1800000000.00",
+        "NPA_90_PLUS": "3000000000.00",
+        "RESTRUCTURED": "1200000000.00",
+        "WRITE_OFF_RECOVERY": "600000000.00"
+      },
+      "totalAmount": "60000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-003",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "28800000000.00",
+        "DPD_1_30": "3200000000.00",
+        "DPD_31_60": "2000000000.00",
+        "DPD_61_90": "1200000000.00",
+        "NPA_90_PLUS": "3600000000.00",
+        "RESTRUCTURED": "800000000.00",
+        "WRITE_OFF_RECOVERY": "400000000.00"
+      },
+      "totalAmount": "40000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-004",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "23100000000.00",
+        "DPD_1_30": "2400000000.00",
+        "DPD_31_60": "1500000000.00",
+        "DPD_61_90": "900000000.00",
+        "NPA_90_PLUS": "1200000000.00",
+        "RESTRUCTURED": "600000000.00",
+        "WRITE_OFF_RECOVERY": "300000000.00"
+      },
+      "totalAmount": "30000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-005",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "14600000000.00",
+        "DPD_1_30": "1600000000.00",
+        "DPD_31_60": "1000000000.00",
+        "DPD_61_90": "600000000.00",
+        "NPA_90_PLUS": "1600000000.00",
+        "RESTRUCTURED": "400000000.00",
+        "WRITE_OFF_RECOVERY": "200000000.00"
+      },
+      "totalAmount": "20000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-006",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "11100000000.00",
+        "DPD_1_30": "1200000000.00",
+        "DPD_31_60": "750000000.00",
+        "DPD_61_90": "450000000.00",
+        "NPA_90_PLUS": "1050000000.00",
+        "RESTRUCTURED": "300000000.00",
+        "WRITE_OFF_RECOVERY": "150000000.00"
+      },
+      "totalAmount": "15000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-007",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "6300000000.00",
+        "DPD_1_30": "800000000.00",
+        "DPD_31_60": "500000000.00",
+        "DPD_61_90": "300000000.00",
+        "NPA_90_PLUS": "1800000000.00",
+        "RESTRUCTURED": "200000000.00",
+        "WRITE_OFF_RECOVERY": "100000000.00"
+      },
+      "totalAmount": "10000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-009",
+      "reportingDate": "2026-08-31",
+      "buckets": {
+        "CURRENT": "5530000000.00",
+        "DPD_1_30": "560000000.00",
+        "DPD_31_60": "350000000.00",
+        "DPD_61_90": "210000000.00",
+        "NPA_90_PLUS": "140000000.00",
+        "RESTRUCTURED": "140000000.00",
+        "WRITE_OFF_RECOVERY": "70000000.00"
+      },
+      "totalAmount": "7000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-001",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "74000000000.00",
+        "DPD_1_30": "8000000000.00",
+        "DPD_31_60": "5000000000.00",
+        "DPD_61_90": "3000000000.00",
+        "NPA_90_PLUS": "7000000000.00",
+        "RESTRUCTURED": "2000000000.00",
+        "WRITE_OFF_RECOVERY": "1000000000.00"
+      },
+      "totalAmount": "100000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-002",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "43800000000.00",
+        "DPD_1_30": "4800000000.00",
+        "DPD_31_60": "3000000000.00",
+        "DPD_61_90": "1800000000.00",
+        "NPA_90_PLUS": "4800000000.00",
+        "RESTRUCTURED": "1200000000.00",
+        "WRITE_OFF_RECOVERY": "600000000.00"
+      },
+      "totalAmount": "60000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-003",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "27600000000.00",
+        "DPD_1_30": "3200000000.00",
+        "DPD_31_60": "2000000000.00",
+        "DPD_61_90": "1200000000.00",
+        "NPA_90_PLUS": "4800000000.00",
+        "RESTRUCTURED": "800000000.00",
+        "WRITE_OFF_RECOVERY": "400000000.00"
+      },
+      "totalAmount": "40000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-004",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "23100000000.00",
+        "DPD_1_30": "2400000000.00",
+        "DPD_31_60": "1500000000.00",
+        "DPD_61_90": "900000000.00",
+        "NPA_90_PLUS": "1200000000.00",
+        "RESTRUCTURED": "600000000.00",
+        "WRITE_OFF_RECOVERY": "300000000.00"
+      },
+      "totalAmount": "30000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-005",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "15000000000.00",
+        "DPD_1_30": "1600000000.00",
+        "DPD_31_60": "1000000000.00",
+        "DPD_61_90": "600000000.00",
+        "NPA_90_PLUS": "1200000000.00",
+        "RESTRUCTURED": "400000000.00",
+        "WRITE_OFF_RECOVERY": "200000000.00"
+      },
+      "totalAmount": "20000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-006",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "10800000000.00",
+        "DPD_1_30": "1200000000.00",
+        "DPD_31_60": "750000000.00",
+        "DPD_61_90": "450000000.00",
+        "NPA_90_PLUS": "1350000000.00",
+        "RESTRUCTURED": "300000000.00",
+        "WRITE_OFF_RECOVERY": "150000000.00"
+      },
+      "totalAmount": "15000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-008",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "10270000000.00",
+        "DPD_1_30": "1040000000.00",
+        "DPD_31_60": "650000000.00",
+        "DPD_61_90": "390000000.00",
+        "NPA_90_PLUS": "260000000.00",
+        "RESTRUCTURED": "260000000.00",
+        "WRITE_OFF_RECOVERY": "130000000.00"
+      },
+      "totalAmount": "13000000000.00"
+    },
+    {
+      "bankId": "SYN-BANK-001",
+      "nbfcId": "SYN-NBFC-009",
+      "reportingDate": "2026-09-30",
+      "buckets": {
+        "CURRENT": "5460000000.00",
+        "DPD_1_30": "560000000.00",
+        "DPD_31_60": "350000000.00",
+        "DPD_61_90": "210000000.00",
+        "NPA_90_PLUS": "210000000.00",
+        "RESTRUCTURED": "140000000.00",
+        "WRITE_OFF_RECOVERY": "70000000.00"
+      },
+      "totalAmount": "7000000000.00"
+    }
+  ],
+  "thresholds": [
+    {
+      "key": "demo-v1",
+      "bankId": "SYN-BANK-001",
+      "name": "Capital Impact Policy - Medium 5% - High 10%",
+      "mediumPct": "5",
+      "highPct": "10"
+    },
+    {
+      "key": "demo-v2",
+      "bankId": "SYN-BANK-001",
+      "name": "Capital Impact Policy - Medium 4% - High 8%",
+      "mediumPct": "4",
+      "highPct": "8"
+    }
+  ],
+  "scenarios": [
+    {
+      "key": "scenario-1",
+      "name": "September Baseline",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "20",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Baseline. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "1680000000.00",
+      "expectedImpactPct": "3.360000",
+      "expectedAlert": "LOW"
+    },
+    {
+      "key": "scenario-2",
+      "name": "September Moderate",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "40",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Moderate. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "3360000000.00",
+      "expectedImpactPct": "6.720000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-3",
+      "name": "September Severe",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Severe. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "5040000000.00",
+      "expectedImpactPct": "10.080000",
+      "expectedAlert": "HIGH"
+    },
+    {
+      "key": "scenario-4",
+      "name": "September Threshold comparison v1",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "50",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Threshold comparison v1. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4200000000.00",
+      "expectedImpactPct": "8.400000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-5",
+      "name": "September Threshold comparison v2",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "50",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v2",
+      "rationale": "Synthetic full-demo analysis: September Threshold comparison v2. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4200000000.00",
+      "expectedImpactPct": "8.400000",
+      "expectedAlert": "HIGH"
+    },
+    {
+      "key": "scenario-6",
+      "name": "August Severe",
+      "reportingDate": "2026-08-31",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: August Severe. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4620000000.00",
+      "expectedImpactPct": "9.240000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-7",
+      "name": "September Higher recovery",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "50",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Higher recovery. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "3600000000.00",
+      "expectedImpactPct": "7.200000",
+      "expectedAlert": "MEDIUM"
+    }
+  ]
+}

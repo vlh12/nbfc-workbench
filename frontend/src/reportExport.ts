@@ -1,3 +1,4 @@
+import { requireReportApproval, type ReportReview } from "./reportReview";
 import type { AnalysisPortfolio, AnalysisScenario } from "./analysisData";
 export function downloadText(filename: string, text: string, type: string) {
  const url = URL.createObjectURL(new Blob([text], { type })); const a = document.createElement("a"); a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -8,13 +9,13 @@ export function exportPortfolioEvidence(snapshot: AnalysisPortfolio, runs: Analy
  downloadText("nbfc-report-"+snapshot.reportingDate+".json",JSON.stringify({ report:"NBFC synthetic portfolio evidence", exportedAt:new Date().toISOString(), note:"Saved scenarios are alternative assumptions. Losses must not be added together. Scenario list covers the latest loaded runs, not a complete archive.", portfolio:snapshot, scenarios:scoped },null,2),"application/json");
 }
 
-const escapeHtml = (value: unknown) => String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
-export function exportPortfolioReport(snapshot: AnalysisPortfolio, runs: AnalysisScenario[]) {
- const scoped=runs.filter(run=>run.snapshotId===snapshot.id && run.bankId===snapshot.bankId);
- const table=(headers:string[],rows:unknown[][])=>"<table><thead><tr>"+headers.map(h=>"<th>"+escapeHtml(h)+"</th>").join("")+"</tr></thead><tbody>"+rows.map(row=>"<tr>"+row.map(value=>"<td>"+escapeHtml(value ?? "Not supplied")+"</td>").join("")+"</tr>").join("")+"</tbody></table>";
- const loans=table(["NBFC","Loan","Amount lent INR","Outstanding INR","Explicit EAD INR","DPD","Status"],snapshot.rows.map(l=>[l.nbfcId,l.loanId,l.amountLent,l.outstandingAmount,l.eadAmount,l.dpdDays,l.loanStatus]));
- const scenarios=table(["Run ID","NBFC","Status","Severity %","Recovery %","Loss INR","Capital impact %","Alert","Threshold ID"],scoped.map(run=>[run.id,run.nbfcId,run.status,run.inputs?.severityPct??run.result?.severityPct,run.inputs?.recoveryPct??run.result?.recoveryPct,run.result?.stressedLoss,run.result?.capitalImpactPct,run.result?.alertSeverity,run.result?.thresholdVersion]));
- const evidence=scoped.map(run=>"<details><summary>"+escapeHtml(run.id)+" — recorded evidence</summary><pre>"+escapeHtml(JSON.stringify(run,null,2))+"</pre></details>").join("");
- const html='<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NBFC portfolio report</title><style>body{font:14px system-ui;color:#173052;margin:40px;line-height:1.6}h1,h2{color:#12356b}header{border-bottom:3px solid #2578ed;padding-bottom:20px}table{border-collapse:collapse;width:100%;font-size:11px;margin:20px 0}th,td{border:1px solid #dce4ef;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf3fc}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f7fa;padding:15px}.note{color:#667991;font-size:12px}@media print{body{margin:12px}details{break-inside:avoid}table{font-size:9px}}</style><header><p class="note">SYNTHETIC DATA · NBFC WORKBENCH</p><h1>'+escapeHtml(snapshot.name || "Portfolio evidence report")+'</h1><p>Bank '+escapeHtml(snapshot.bankId)+' · Reporting date '+escapeHtml(snapshot.reportingDate)+' · '+escapeHtml(snapshot.status)+'</p><p class="note">Portfolio ID '+escapeHtml(snapshot.id)+' · Exported '+escapeHtml(new Date().toISOString())+'</p></header><h2>Portfolio loans</h2>'+loans+'<h2>Saved stress scenarios</h2><p class="note">Latest loaded runs for this portfolio. Alternative scenarios must not be summed. Thresholds are prototype settings, not regulatory limits.</p>'+scenarios+'<h2>Recorded scenario evidence</h2>'+evidence+'<h2>Reconciliation warnings</h2><pre>'+escapeHtml(JSON.stringify(snapshot.warnings,null,2))+'</pre><p class="note">Use your browser Print command to save this report as PDF. Blank EAD is not treated as zero.</p></html>';
- downloadText("nbfc-report-"+snapshot.reportingDate+".html",html,"text/html;charset=utf-8");
+export async function exportPortfolioReport(snapshot: AnalysisPortfolio, runs: AnalysisScenario[], review: ReportReview = {state:"not_loaded"}) {
+ requireReportApproval(snapshot, runs, review);
+ const { createPortfolioPdf } = await import("./pdfReport");
+ const bytes = await createPortfolioPdf(snapshot, runs, review);
+ const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "application/pdf" }));
+ const a = document.createElement("a");
+ a.href = url; a.download = "nbfc-report-" + snapshot.reportingDate + ".pdf";
+ document.body.append(a); a.click(); a.remove();
+ setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

@@ -23,7 +23,7 @@ class PortfolioStoreTest{
   assertThat(store.list()).extracting(Entry::name).containsExactly(first.name(),second.name());
   assertThat(store.get(first.id(),"PORTFOLIO",Snapshot.class).rows()).hasSize(16);
   assertThat(store.get(second.id(),"PORTFOLIO",Snapshot.class).rows()).hasSize(16);
-  assertThat(first.status()).isEqualTo("VALIDATED");
+  assertThat(first.status()).isEqualTo("PENDING_REVIEW");
   assertThat(database).hasSize(2);
  }
  @Test void qualityTotalsAndCapitalAreValidated(){

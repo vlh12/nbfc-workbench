@@ -14,6 +14,7 @@ public class GovernanceController {
  public record Decision(String decision,String note) {}
  public record FollowUpRequest(String title,String owner,LocalDate dueDate) {}
  public record FollowUpUpdate(String status,String evidence) {}
+ @GetMapping("/my-assessments") @PreAuthorize("hasRole('ANALYST')") public List<Assessment> mine(Authentication actor){return assessments.findTop100BySubmittedByOrderBySubmittedAtDesc(actor.getName());}
  @GetMapping("/assessments") @PreAuthorize("hasRole('SUPERVISOR')") public List<Assessment> assessments(){return assessments.findTop100ByOrderBySubmittedAtDesc();}
  @GetMapping("/assessments/queue") @PreAuthorize("hasRole('SUPERVISOR')") public List<Assessment> queue(){return assessments.findTop100ByOrderBySubmittedAtDesc();}
  @PostMapping("/assessments") @PreAuthorize("hasRole('ANALYST')") public Assessment submit(@RequestBody Submission body,Authentication actor){return service.submit(body.batchId(),body.note(),actor.getName());}

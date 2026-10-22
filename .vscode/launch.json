@@ -23,7 +23,8 @@
         "DB_USER": "system",
         "KAFKA_BOOTSTRAP": "localhost:9092"
       },
-      "envFile": "${workspaceFolder}/.vscode/local.env"
+      "envFile": "${workspaceFolder}/.vscode/local.env",
+      "projectName": "access-data"
     },
     {
       "type": "java",
@@ -40,7 +41,8 @@
         "DB_USER": "system",
         "KAFKA_BOOTSTRAP": "localhost:9092"
       },
-      "envFile": "${workspaceFolder}/.vscode/local.env"
+      "envFile": "${workspaceFolder}/.vscode/local.env",
+      "projectName": "exposure-analytics"
     },
     {
       "type": "java",
@@ -53,7 +55,9 @@
         "WORKBENCH_DEMO_ENABLED": "true",
         "SERVER_ADDRESS": "127.0.0.1",
         "SERVER_PORT": "8090"
-      }
+      },
+      "projectName": "gateway",
+      "envFile": "${workspaceFolder}/.vscode/local.env"
     },
     {
       "type": "java",

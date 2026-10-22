@@ -1,0 +1,134 @@
+{
+  "periods": [
+    {
+      "reportingDate": "2026-07-31",
+      "name": "2026-07 Monthly Exposure Portfolio",
+      "loans": 16,
+      "nbfcs": 8,
+      "totalEad": "28000000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "10000000000.00",
+        "SYN-NBFC-002": "6000000000.00",
+        "SYN-NBFC-003": "4000000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2000000000.00",
+        "SYN-NBFC-006": "1500000000.00",
+        "SYN-NBFC-007": "1000000000.00",
+        "SYN-NBFC-009": "500000000.00"
+      }
+    },
+    {
+      "reportingDate": "2026-08-31",
+      "name": "2026-08 Monthly Exposure Portfolio",
+      "loans": 16,
+      "nbfcs": 8,
+      "totalEad": "29700000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "11000000000.00",
+        "SYN-NBFC-002": "5500000000.00",
+        "SYN-NBFC-003": "4500000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2500000000.00",
+        "SYN-NBFC-006": "1400000000.00",
+        "SYN-NBFC-007": "1200000000.00",
+        "SYN-NBFC-009": "600000000.00"
+      }
+    },
+    {
+      "reportingDate": "2026-09-30",
+      "name": "2026-09 Monthly Exposure Portfolio",
+      "loans": 16,
+      "nbfcs": 8,
+      "totalEad": "30000000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "12000000000.00",
+        "SYN-NBFC-002": "5000000000.00",
+        "SYN-NBFC-003": "5000000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2000000000.00",
+        "SYN-NBFC-006": "1000000000.00",
+        "SYN-NBFC-008": "1300000000.00",
+        "SYN-NBFC-009": "700000000.00"
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "September Baseline",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "20",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "1680000000",
+      "expected_capital_impact_pct": "3.36",
+      "expected_alert": "LOW"
+    },
+    {
+      "name": "September Moderate",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "40",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "3360000000",
+      "expected_capital_impact_pct": "6.72",
+      "expected_alert": "MEDIUM"
+    },
+    {
+      "name": "September Severe",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "60",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "5040000000",
+      "expected_capital_impact_pct": "10.08",
+      "expected_alert": "HIGH"
+    },
+    {
+      "name": "September Threshold comparison v1",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "50",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "4200000000",
+      "expected_capital_impact_pct": "8.4",
+      "expected_alert": "MEDIUM"
+    },
+    {
+      "name": "September Threshold comparison v2",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "50",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v2",
+      "expected_loss_inr": "4200000000",
+      "expected_capital_impact_pct": "8.4",
+      "expected_alert": "HIGH"
+    },
+    {
+      "name": "August Severe",
+      "reporting_date": "2026-08-31",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "60",
+      "recovery_pct": "30",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "4620000000",
+      "expected_capital_impact_pct": "9.24",
+      "expected_alert": "MEDIUM"
+    },
+    {
+      "name": "September Higher recovery",
+      "reporting_date": "2026-09-30",
+      "nbfc_id": "SYN-NBFC-001",
+      "severity_pct": "60",
+      "recovery_pct": "50",
+      "threshold_key": "demo-v1",
+      "expected_loss_inr": "3600000000",
+      "expected_capital_impact_pct": "7.2",
+      "expected_alert": "MEDIUM"
+    }
+  ]
+}

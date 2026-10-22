@@ -24,3 +24,8 @@ Later entries: date, question/options, source section/page, human decision/appro
 ## Implementation decisions on 18 October 2026
 
 The user answered yes to adding explicit ead_amount and accepted configurable capital/threshold inputs without invented defaults. Original 19-column portfolios remain reviewable with warnings; they cannot support stress approval without explicit EAD and resolved reconciliation. A new compatible portfolio path preserves saved lending reports. Explicit Save is retained; warning-free portfolio versions are accepted automatically. Prototype requests are scoped to the fixed demo bank; this is not production bank identity. Reviewable snapshots are immutable and explicitly selected, without an active replacement pointer. Stale dates are blocked; no override entitlement has been invented. Details: docs/phase0-implementation.md.
+
+
+## User-requested reviewed workflow, 22 October 2026
+
+The current user explicitly requested initial Supervisor confirmation of contributor data before analyst calculations. This supersedes automatic approval of warning-free new contributor inputs. Contributor save creates PENDING_REVIEW; authorized Supervisor approval/return is recorded separately, with analyst access blocked until approval. Final scenario assessment approval remains separate and is required for PDF export. Details and verification: [workflow handover](../docs/workflow-reset-and-handover.md).

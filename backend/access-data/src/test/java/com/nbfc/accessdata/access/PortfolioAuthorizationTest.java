@@ -201,6 +201,26 @@ class PortfolioAuthorizationTest {
         verifyNoInteractions(store);
     }
 
+    @Test void onlySupervisorCanReviewContributorData() throws Exception {
+        for(String role:List.of("CONTRIBUTOR","ANALYST")) {
+            mvc.perform(post("/api/portfolios/data-1/review").contentType("application/json").content("{\"decision\":\"APPROVED\",\"note\":\"Checked\"}").with(signedIn(role)).with(csrf())).andExpect(status().isForbidden());
+        }
+        verifyNoInteractions(store);
+        mvc.perform(post("/api/portfolios/data-1/review").contentType("application/json").content("{\"decision\":\"APPROVED\",\"note\":\"Checked\"}").with(signedIn("SUPERVISOR")).with(csrf())).andExpect(status().isOk());
+        verify(store).review("data-1","APPROVED","Checked",USER_ID);
+    }
+    @Test void analystSeesOnlyApprovedInputs() throws Exception {
+        var now=Instant.now();
+        when(store.list()).thenReturn(List.of(
+            new com.nbfc.shared.PortfolioData.Entry("approved","CAPITAL","SYN-BANK-001",LocalDate.now(),"APPROVED","contributor",now,1,"Approved capital"),
+            new com.nbfc.shared.PortfolioData.Entry("pending","CAPITAL","SYN-BANK-001",LocalDate.now(),"PENDING_REVIEW","contributor",now,1,"Pending capital")));
+        mvc.perform(get("/api/portfolios").with(signedIn("ANALYST"))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].id").value("approved"));
+        mvc.perform(get("/api/portfolios").with(signedIn("SUPERVISOR"))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2));
+    }
+    @Test void directAnalystInputReadRequiresApproval() throws Exception {
+        mvc.perform(get("/api/portfolios/capital/capital-1").with(signedIn("ANALYST"))).andExpect(status().isOk());
+        verify(store).requireApproved("capital-1");
+    }
     private static RequestPostProcessor signedIn(String role) {
         var principal = new WorkbenchPrincipal(
                 USER_ID,

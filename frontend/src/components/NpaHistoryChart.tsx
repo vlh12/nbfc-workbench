@@ -1,10 +1,11 @@
+import { entryLabel, scenarioName } from "../workflowLabels";
 import { useEffect, useRef, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../auth";
 import { moneyLabel } from "../dashboardMetrics";
 import { latestNpaPeriods, type QualityVersion } from "../riskExploration";
 import { Button } from "./ui/button";
-type Entry = { id: string; kind: string; status: string; createdAt: string };
+type Entry = { name?: string | null; id: string; kind: string; status: string; createdAt: string };
 type Point = ReturnType<typeof latestNpaPeriods>[number];
 export function NpaHistoryChart({ bankId, nbfcId, entries }: { bankId: string; nbfcId: string; entries: Entry[] }) {
   const [points, setPoints] = useState<Point[] | null>(null), [loading, setLoading] = useState(false), [error, setError] = useState("");
@@ -32,7 +33,7 @@ export function NpaHistoryChart({ bankId, nbfcId, entries }: { bankId: string; n
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">{error}</p>}
     {points && <>
       {points.filter(p => p.percentage != null).length < 2 ? <p className="text-sm text-slate-500">At least two distinct reporting dates with positive totals are needed for a line chart. Save another asset-quality period for this NBFC.</p> : <div className="h-72 w-full min-w-0" aria-label="NPA percentage line chart; exact values in the history table"><ResponsiveContainer width="100%" height="100%"><LineChart data={points} margin={{ top: 12, right: 16, bottom: 8, left: 0 }}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="reportingDate" tick={{ fontSize: 11 }} /><YAxis domain={[0, 100]} tickFormatter={v => v + "%"} width={48} /><Tooltip content={({ active, payload }) => { const point = payload?.[0]?.payload as Point | undefined; return active && point ? <div className="rounded border border-slate-200 bg-white p-3 text-xs shadow"><p>{point.reportingDate} · {point.nbfcId}</p><p>NPA {point.percentage}% · {moneyLabel(point.npa)}</p><p>Total {moneyLabel(point.total)}</p><p>Version {point.id}</p></div> : null; }} /><Line name="NPA percentage" type="linear" dataKey="chartPercentage" stroke="#be185d" strokeWidth={2} dot={{ r: 4 }} connectNulls={false} isAnimationActive={false} /></LineChart></ResponsiveContainer></div>}
-      <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="sr-only">NPA history exact values and source versions</caption><thead><tr><th className="py-2">Reporting date</th><th>NPA INR</th><th>Total INR</th><th>NPA %</th><th>Version</th></tr></thead><tbody>{points.map(point => <tr key={point.id} className="border-t"><td className="py-2 pr-3">{point.reportingDate}</td><td className="whitespace-nowrap pr-3">{moneyLabel(point.npa)}</td><td className="whitespace-nowrap pr-3">{moneyLabel(point.total)}</td><td className="pr-3">{point.percentage == null ? "Not available (zero total)" : point.percentage + "%"}</td><td className="font-mono" title={point.id}>{point.id.slice(0, 8)}</td></tr>)}</tbody></table></div>
+      <div className="overflow-x-auto"><table className="w-full text-left text-xs"><caption className="sr-only">NPA history exact values and source versions</caption><thead><tr><th className="py-2">Reporting date</th><th>NPA INR</th><th>Total INR</th><th>NPA %</th><th>Version</th></tr></thead><tbody>{points.map(point => <tr key={point.id} className="border-t"><td className="py-2 pr-3">{point.reportingDate}</td><td className="whitespace-nowrap pr-3">{moneyLabel(point.npa)}</td><td className="whitespace-nowrap pr-3">{moneyLabel(point.total)}</td><td className="pr-3">{point.percentage == null ? "Not available (zero total)" : point.percentage + "%"}</td><td className="font-mono" title={point.id}>{entries.find(e=>e.id===point.id)?.name || "Asset quality - "+point.reportingDate}</td></tr>)}</tbody></table></div>
       {!points.length && <p className="text-sm text-slate-500">No approved asset-quality history for this NBFC in the loaded records.</p>}
     </>}
   </section>;

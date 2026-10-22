@@ -6,7 +6,7 @@ export type AnalysisEntry = { name?: string | null; id: string; kind: string; re
 export type AnalysisScenario = {
   id: string; bankId: string; snapshotId: string; nbfcId: string; status: string; createdAt: string;
   modelVersion?: string; failureReason: string | null;
-  inputs?: { capitalId: string; qualityId: string; thresholdId: string; severityPct: string; recoveryPct: string; rationale: string };
+  inputs?: { name?: string; capitalId: string; qualityId: string; thresholdId: string; severityPct: string; recoveryPct: string; rationale: string };
   result: { eadAmount: string; eligibleCapital: string; capitalLabel: string; severityPct?: string; recoveryPct?: string;
     stressedLoss: string; capitalImpactPct: string; concentrationCapitalPct: string; alertSeverity: string;
     thresholdVersion: string; mediumPct: string; highPct: string; formula: string } | null;

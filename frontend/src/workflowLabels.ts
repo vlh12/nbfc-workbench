@@ -1,0 +1,3 @@
+import type { AnalysisScenario } from "./analysisData";
+export function scenarioName(run:AnalysisScenario){return run.inputs?.name?.trim() || `${run.nbfcId} - Severity ${run.inputs?.severityPct || run.result?.severityPct || "?"}% / Recovery ${run.inputs?.recoveryPct || run.result?.recoveryPct || "?"}%`;}
+export function entryLabel(entry:{name?:string|null;kind?:string;reportingDate?:string|null;status?:string;createdAt?:string}){return [entry.name || entry.kind?.replaceAll("_"," ") || "Saved input",entry.reportingDate,entry.status?.replaceAll("_"," "),entry.createdAt?new Date(entry.createdAt).toLocaleString("en-IN"):null].filter(Boolean).join(" · ");}

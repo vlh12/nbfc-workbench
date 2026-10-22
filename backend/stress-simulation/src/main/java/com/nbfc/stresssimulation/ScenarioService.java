@@ -32,6 +32,7 @@ public class ScenarioService {
         }
         String id=UUID.randomUUID().toString(); Instant now=Instant.now(); Result result=null;String failure=null;
         try {
+            require(request.name()==null || (!request.name().isBlank()&&request.name().length()<=120&&request.name().chars().noneMatch(Character::isISOControl)),"Provide a scenario name up to 120 characters.");
             require(request.rationale()!=null&&!request.rationale().isBlank()&&request.rationale().length()<=2000,"Provide a scenario rationale up to 2000 characters.");
             require(validId(request.snapshotId())&&validId(request.capitalId())&&validId(request.qualityId())&&validId(request.thresholdId()),"Select saved portfolio, capital, asset-quality and threshold versions.");
             var snapshot=LocalServiceClient.get(access,"/api/portfolios/"+request.snapshotId(),Snapshot.class);
