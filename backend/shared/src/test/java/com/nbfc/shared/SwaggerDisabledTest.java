@@ -12,7 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes=SwaggerDisabledTest.DisabledApp.class,properties={"WORKBENCH_DEMO_ENABLED=false","springdoc.api-docs.enabled=false","springdoc.swagger-ui.enabled=false"})
 @AutoConfigureMockMvc
 class SwaggerDisabledTest {
-    @Configuration(proxyBeanMethods=false) @EnableAutoConfiguration @Import(ApiSecurity.class)
+    @Configuration(proxyBeanMethods=false) @EnableAutoConfiguration(
+    	    exclude =
+            org.springframework.boot.autoconfigure.jdbc
+                .DataSourceAutoConfiguration.class
+    ) @Import(ApiSecurity.class)
     static class DisabledApp {}
     @Autowired MockMvc mvc;
     @Test void demoDisabledDoesNotExposeSwaggerOrGatewaySpecs()throws Exception {

@@ -1,16 +1,43 @@
 server:
   address: ${SERVER_ADDRESS:127.0.0.1}
   port: 8090
+  servlet:
+    session:
+      cookie:
+        name: GWSESSION
+        http-only: true
+        same-site: lax
+        path: /
+        secure: ${WORKBENCH_COOKIE_SECURE:false}
 
 spring:
   application:
     name: gateway
+
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: system
+    password: "your_actual_password"
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  session:
+    timeout: 30m
+    jdbc:
+      initialize-schema: never
+      table-name: WB_SESSION
 
   cloud:
     gateway:
       server:
         webmvc:
           routes:
+            - id: access-data-auth
+              uri: ${ACCESS_DATA_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - RemoveRequestHeader=X-Demo-Role
+
             - id: access-data-openapi
               uri: ${ACCESS_DATA_URL:http://localhost:8081}
               predicates:
@@ -72,7 +99,9 @@ springdoc:
   api-docs:
     enabled: ${WORKBENCH_DEMO_ENABLED:false}
     path: /v3/api-docs
+
   paths-to-match: /api/**
+
   swagger-ui:
     enabled: ${WORKBENCH_DEMO_ENABLED:false}
     path: /swagger-ui.html

@@ -47,7 +47,15 @@ public class ScenarioService {
             var ead=loans.stream().map(l->new BigDecimal(l.eadAmount())).reduce(BigDecimal.ZERO,BigDecimal::add);
             result=calculate(ead,capital,thresholds,request);
         } catch(IllegalArgumentException e){failure=e.getMessage();}
-          catch(ResponseStatusException e){failure=e.getReason();}
+          catch (ResponseStatusException e) {
+            int status = e.getStatusCode().value();
+
+            if (status == 401 || status == 403) {
+                throw e;
+            }
+
+            failure = e.getReason();
+        }
         var run=new Run(id,PortfolioData.BANK,request.snapshotId(),request.nbfcId(),failure==null?"COMPLETED":"FAILED",actor,now,"phase0-direct-loss-v1",request,result,failure);
         var record=new ScenarioRecord();record.id=id;record.bankId=run.bankId();record.createdBy=actor;record.createdAt=now;record.requestKey=request.idempotencyKey();record.requestHash=hash;record.payload=encode(run);runs.saveAndFlush(record);
         return run;
