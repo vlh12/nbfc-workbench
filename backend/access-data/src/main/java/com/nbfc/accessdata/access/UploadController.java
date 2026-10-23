@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Legacy exposure batches",description="Three-column exposure uploads and batch status.")
 @RestController
 @RequestMapping("/api/batches")
 public class UploadController {

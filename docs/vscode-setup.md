@@ -1,5 +1,7 @@
 # Run and debug in VS Code
 
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 Open the `nbfc-exposure-stress-alert-workbench` folder itself, not its parent ChatGPT mirror. The folder must contain `pom.xml`, `compose.yml`, `backend` and `frontend`.
 
 ## Native upload-to-dashboard run

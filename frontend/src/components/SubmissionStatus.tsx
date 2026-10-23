@@ -1,0 +1,8 @@
+import {useState} from "react";
+import {api} from "../auth";
+import {entryLabel} from "../workflowLabels";
+export function SubmissionStatus({entries}:{entries:{id:string;kind:string;name?:string|null;status:string;reportingDate:string|null;createdAt:string}[]}){
+ const [history,setHistory]=useState<{id:string;decision:string;reviewNote:string;reviewedAt:string}[]>([]),[selected,setSelected]=useState(""),[error,setError]=useState("");
+ async function open(id:string){setSelected(id);setHistory([]);setError("");try{setHistory(await api<typeof history>("/api/portfolios/"+id+"/reviews"))}catch{setError("Review feedback could not be loaded.")}}
+ return <section className="dashboard-card"><h3 className="font-bold">Submitted data and Supervisor feedback</h3><p>Portfolio, capital and asset quality are reviewed separately. Returned data needs a new corrected version.</p><div className="table-scroll"><table className="w-full text-left text-sm"><thead><tr><th>Input name</th><th>Status</th><th>Feedback</th></tr></thead><tbody>{entries.filter(e=>["PORTFOLIO","CAPITAL","QUALITY"].includes(e.kind)&&e.status!=="VALIDATION_FAILED").map(e=><tr key={e.id}><td>{entryLabel(e)}</td><td>{e.status.replaceAll("_"," ")}</td><td><button className="text-action" onClick={()=>void open(e.id)}>View review notes</button></td></tr>)}</tbody></table></div>{error&&<p role="alert">{error}</p>}{selected&&!error&&!history.length&&<p>No Supervisor decision has been recorded for this input yet.</p>}{history.map(event=><p key={event.id}>{event.decision} · {new Date(event.reviewedAt).toLocaleString("en-IN")} · {event.reviewNote}</p>)}</section>
+}

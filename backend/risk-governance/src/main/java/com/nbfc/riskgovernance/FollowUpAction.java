@@ -13,6 +13,8 @@ public class FollowUpAction {
  @Column(name="created_by",nullable=false,length=255) public String createdBy;
  @Column(name="created_at",nullable=false) public Instant createdAt;
  @Column(name="updated_at",nullable=false) public Instant updatedAt;
+ @Column(length=2000) public String evidence;
+ @Version public long version;
  protected FollowUpAction() {}
  public FollowUpAction(String id,String assessmentId,String title,String owner,LocalDate dueDate,String actor) { this.id=id;this.assessmentId=assessmentId;this.title=title;this.owner=owner;this.dueDate=dueDate;this.status="OPEN";this.createdBy=actor;this.createdAt=Instant.now();this.updatedAt=this.createdAt; }
 }

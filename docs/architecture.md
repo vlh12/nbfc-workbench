@@ -1,5 +1,7 @@
 # NBFC Exposure Stress & Alert Workbench architecture
 
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 This project is a synthetic-data prototype for collecting NBFC exposure records, calculating exposure totals, submitting analyst assessments and recording supervisor decisions. It uses a React frontend, Spring Boot microservices, Oracle Database, Kafka and a Spring Cloud Gateway.
 
 ## Business services

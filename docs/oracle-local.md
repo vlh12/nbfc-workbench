@@ -1,11 +1,13 @@
 # Oracle Database configuration
-Example 
+
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 The intended native development database is Oracle Free/AI Database with the `FREEPDB1` pluggable database.
 
-~~~ eg text
+~~~text
 URL:      jdbc:oracle:thin:@//localhost:1521/FREEPDB1
 Username: user
-Password: vikas123
+Password: <your-local-database-password>
 ~~~
 
 The VS Code launch configuration passes these values to the upload services. Risk Governance reads `DB_URL`, `DB_USER` and `DB_PASSWORD` from its environment. Before native startup, confirm that Access & Data and Exposure Analytics honor the same account in their `application.yml`; their checked-in defaults contain legacy values and the environment override must be honored.
@@ -30,3 +32,5 @@ On Windows, start the Oracle service and listener, then open `FREEPDB1` if neces
 
 No startup script changes passwords, creates users or deletes tables.
 
+
+VS Code reads the database password from ignored `.vscode/local.env` (format: `DB_PASSWORD=your-local-password`). Set `DB_PASSWORD` in your shell for direct Java startup, or in ignored `.env` for Docker Compose. Keep these files local.

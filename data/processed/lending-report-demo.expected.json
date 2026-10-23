@@ -1,0 +1,12 @@
+{
+  "status": "Hand-calculated current-format fixture; not application output",
+  "currency": "INR",
+  "unit": "RUPEE",
+  "row_count": 3,
+  "amount_lent": "1400000000.00",
+  "interest_amount": "81000000.00",
+  "total_payable": "1481000000.00",
+  "amount_repaid": "250000000.00",
+  "outstanding_amount": "1231000000.00",
+  "revenue_amount_once": "180000000.00"
+}

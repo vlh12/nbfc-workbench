@@ -1,5 +1,7 @@
 # Run the workbench locally without Keycloak
 
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 Keycloak was removed at the user's request. The local UI uses selectable Contributor, Analyst or Supervisor demo roles. No login server or password is required, but the selector is caller-controlled and must never be used as production authentication.
 
 ## Prerequisites

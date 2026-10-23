@@ -1,5 +1,7 @@
 # Supervisor workflow
 
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 Risk Governance is the microservice responsible for assessment decisions, follow-up actions and audit history. It runs on port 8084 and owns the governance tables. The frontend supervisor panel provides this workflow.
 
 ## Analyst submission

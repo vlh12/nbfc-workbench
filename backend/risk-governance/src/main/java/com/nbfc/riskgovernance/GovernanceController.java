@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+@io.swagger.v3.oas.annotations.tags.Tag(name="Review and audit",description="Assessments, supervisor decisions, follow-up actions, evidence and audit history.")
 @RestController
 @RequestMapping("/api/governance")
 public class GovernanceController {
@@ -12,7 +13,8 @@ public class GovernanceController {
  public record Submission(String batchId,String note) {}
  public record Decision(String decision,String note) {}
  public record FollowUpRequest(String title,String owner,LocalDate dueDate) {}
- public record FollowUpUpdate(String status) {}
+ public record FollowUpUpdate(String status,String evidence) {}
+ @GetMapping("/my-assessments") @PreAuthorize("hasRole('ANALYST')") public List<Assessment> mine(Authentication actor){return assessments.findTop100BySubmittedByOrderBySubmittedAtDesc(actor.getName());}
  @GetMapping("/assessments") @PreAuthorize("hasRole('SUPERVISOR')") public List<Assessment> assessments(){return assessments.findTop100ByOrderBySubmittedAtDesc();}
  @GetMapping("/assessments/queue") @PreAuthorize("hasRole('SUPERVISOR')") public List<Assessment> queue(){return assessments.findTop100ByOrderBySubmittedAtDesc();}
  @PostMapping("/assessments") @PreAuthorize("hasRole('ANALYST')") public Assessment submit(@RequestBody Submission body,Authentication actor){return service.submit(body.batchId(),body.note(),actor.getName());}
@@ -20,6 +22,6 @@ public class GovernanceController {
  @PostMapping("/assessments/{id}/approve") @PreAuthorize("hasRole('SUPERVISOR')") public Assessment approve(@PathVariable String id,@RequestBody Decision body,Authentication actor){return service.decide(id,"APPROVED",body.note(),actor.getName());}
  @GetMapping("/follow-ups") @PreAuthorize("hasRole('SUPERVISOR')") public List<FollowUpAction> followUps(){return followUps.findTop100ByOrderByDueDateAsc();}
  @PostMapping("/assessments/{id}/follow-ups") @PreAuthorize("hasRole('SUPERVISOR')") public FollowUpAction add(@PathVariable String id,@RequestBody FollowUpRequest body,Authentication actor){return service.addFollowUp(id,body.title(),body.owner(),body.dueDate(),actor.getName());}
- @PatchMapping("/follow-ups/{id}") @PreAuthorize("hasRole('SUPERVISOR')") public FollowUpAction update(@PathVariable String id,@RequestBody FollowUpUpdate body,Authentication actor){return service.updateFollowUp(id,body.status(),actor.getName());}
+ @PatchMapping("/follow-ups/{id}") @PreAuthorize("hasRole('SUPERVISOR')") public FollowUpAction update(@PathVariable String id,@RequestBody FollowUpUpdate body,Authentication actor){return service.updateFollowUp(id,body.status(),body.evidence(),actor.getName());}
  @GetMapping("/audit") @PreAuthorize("hasRole('SUPERVISOR')") public List<AuditEvent> audit(){return audit.findTop200ByOrderByCreatedAtDesc();}
 }

@@ -1,0 +1,15 @@
+{
+  "status": "RECOMMENDED candidate, not application output",
+  "schema": "EAD-v1-proposed",
+  "scope_assumption": "bank/reporting_date; unresolved DEC-03",
+  "bank_id": "SYN-BANK-001",
+  "reporting_date": "2026-09-30",
+  "currency": "INR",
+  "unit": "RUPEE",
+  "row_count": 3,
+  "ead_by_nbfc": {
+    "SYN-NBFC-001": "2000000.00",
+    "SYN-NBFC-002": "500000.00"
+  },
+  "total_ead_amount": "2500000.00"
+}

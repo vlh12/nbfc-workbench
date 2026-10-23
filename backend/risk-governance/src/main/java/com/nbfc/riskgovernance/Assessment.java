@@ -13,6 +13,9 @@ public class Assessment {
  @Column(name="decided_by",length=255) public String decidedBy;
  @Column(name="submitted_at",nullable=false) public Instant submittedAt;
  @Column(name="decided_at") public Instant decidedAt;
+ @Column(name="scenario_id",length=36) public String scenarioId;
+ @Lob @Column(name="scenario_evidence") public String scenarioEvidence;
+ @Version public long version;
  protected Assessment() {}
  public Assessment(String id,String batchId,String submittedBy,String note) { this.id=id;this.batchId=batchId;this.submittedBy=submittedBy;this.submissionNote=note;this.status="SUBMITTED";this.submittedAt=Instant.now(); }
  public boolean canDecide() { return "SUBMITTED".equals(status) || "RETURNED".equals(status); }

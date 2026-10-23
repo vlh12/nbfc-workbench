@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Attach to Suspended Terminal",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 52851
+    },
+    {
+      "type": "java",
       "name": "Access & Data",
       "request": "launch",
       "mainClass": "com.nbfc.accessdata.Application",
@@ -13,10 +20,11 @@
         "SERVER_ADDRESS": "127.0.0.1",
         "SERVER_PORT": "8081",
         "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
-        "DB_USER": "user",
-        "DB_PASSWORD": "vikas123",
+        "DB_USER": "system",
         "KAFKA_BOOTSTRAP": "localhost:9092"
-      }
+      },
+      "envFile": "${workspaceFolder}/.vscode/local.env",
+      "projectName": "access-data"
     },
     {
       "type": "java",
@@ -30,10 +38,11 @@
         "SERVER_ADDRESS": "127.0.0.1",
         "SERVER_PORT": "8082",
         "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
-        "DB_USER": "user",
-        "DB_PASSWORD": "vikas123",
+        "DB_USER": "system",
         "KAFKA_BOOTSTRAP": "localhost:9092"
-      }
+      },
+      "envFile": "${workspaceFolder}/.vscode/local.env",
+      "projectName": "exposure-analytics"
     },
     {
       "type": "java",
@@ -46,13 +55,66 @@
         "WORKBENCH_DEMO_ENABLED": "true",
         "SERVER_ADDRESS": "127.0.0.1",
         "SERVER_PORT": "8090"
-      }
+      },
+      "projectName": "gateway",
+      "envFile": "${workspaceFolder}/.vscode/local.env"
+    },
+    {
+      "type": "java",
+      "name": "Stress Simulation",
+      "request": "launch",
+      "mainClass": "com.nbfc.stresssimulation.Application",
+      "projectName": "stress-simulation",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "WORKBENCH_DEMO_ENABLED": "true",
+        "SERVER_ADDRESS": "127.0.0.1",
+        "SERVER_PORT": "8083",
+        "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
+        "DB_USER": "system",
+        "KAFKA_BOOTSTRAP": "localhost:9092"
+      },
+      "envFile": "${workspaceFolder}/.vscode/local.env"
+    },
+    {
+      "type": "java",
+      "name": "Risk Governance",
+      "request": "launch",
+      "mainClass": "com.nbfc.riskgovernance.Application",
+      "projectName": "risk-governance",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "WORKBENCH_DEMO_ENABLED": "true",
+        "SERVER_ADDRESS": "127.0.0.1",
+        "SERVER_PORT": "8084",
+        "DB_URL": "jdbc:oracle:thin:@//localhost:1521/FREEPDB1",
+        "DB_USER": "system",
+        "KAFKA_BOOTSTRAP": "localhost:9092"
+      },
+      "envFile": "${workspaceFolder}/.vscode/local.env"
     }
   ],
   "compounds": [
     {
       "name": "Upload-to-dashboard backend",
-      "configurations": ["Access & Data", "Exposure Analytics", "API Gateway"],
+      "configurations": [
+        "Access & Data",
+        "Exposure Analytics",
+        "API Gateway"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "All workbench services",
+      "configurations": [
+        "Access & Data",
+        "Exposure Analytics",
+        "Stress Simulation",
+        "Risk Governance",
+        "API Gateway"
+      ],
       "stopAll": true
     }
   ]

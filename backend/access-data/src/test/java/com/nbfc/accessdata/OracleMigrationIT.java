@@ -28,11 +28,11 @@ class OracleMigrationIT {
         var flyway=Flyway.configure().dataSource(url,"SYN_TEST","SyntheticTest26")
             .table("access_data_flyway_history").baselineOnMigrate(true).baselineVersion("0")
             .locations("classpath:db/migration").load();
-        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(8);
         assertThat(flyway.migrate().migrationsExecuted).isZero();
         try(var factory=new org.hibernate.cfg.Configuration()
                 .addAnnotatedClass(com.nbfc.accessdata.data.Batch.class)
-                .addAnnotatedClass(com.nbfc.accessdata.data.OutboxEvent.class)
+                .addAnnotatedClass(com.nbfc.accessdata.auth.ApplicationUser.class)
                 .setProperty("hibernate.connection.url",url)
                 .setProperty("hibernate.connection.username","SYN_TEST")
                 .setProperty("hibernate.connection.password","SyntheticTest26")

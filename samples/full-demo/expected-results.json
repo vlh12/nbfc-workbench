@@ -1,0 +1,152 @@
+{
+  "periods": [
+    {
+      "reportingDate": "2026-07-31",
+      "loanCount": 16,
+      "nbfcCount": 8,
+      "totalEad": "28000000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "10000000000.00",
+        "SYN-NBFC-002": "6000000000.00",
+        "SYN-NBFC-003": "4000000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2000000000.00",
+        "SYN-NBFC-006": "1500000000.00",
+        "SYN-NBFC-007": "1000000000.00",
+        "SYN-NBFC-009": "500000000.00"
+      }
+    },
+    {
+      "reportingDate": "2026-08-31",
+      "loanCount": 16,
+      "nbfcCount": 8,
+      "totalEad": "29700000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "11000000000.00",
+        "SYN-NBFC-002": "5500000000.00",
+        "SYN-NBFC-003": "4500000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2500000000.00",
+        "SYN-NBFC-006": "1400000000.00",
+        "SYN-NBFC-007": "1200000000.00",
+        "SYN-NBFC-009": "600000000.00"
+      }
+    },
+    {
+      "reportingDate": "2026-09-30",
+      "loanCount": 16,
+      "nbfcCount": 8,
+      "totalEad": "30000000000.00",
+      "nbfcEad": {
+        "SYN-NBFC-001": "12000000000.00",
+        "SYN-NBFC-002": "5000000000.00",
+        "SYN-NBFC-003": "5000000000.00",
+        "SYN-NBFC-004": "3000000000.00",
+        "SYN-NBFC-005": "2000000000.00",
+        "SYN-NBFC-006": "1000000000.00",
+        "SYN-NBFC-008": "1300000000.00",
+        "SYN-NBFC-009": "700000000.00"
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "key": "scenario-1",
+      "name": "September Baseline",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "20",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Baseline. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "1680000000.00",
+      "expectedImpactPct": "3.360000",
+      "expectedAlert": "LOW"
+    },
+    {
+      "key": "scenario-2",
+      "name": "September Moderate",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "40",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Moderate. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "3360000000.00",
+      "expectedImpactPct": "6.720000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-3",
+      "name": "September Severe",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Severe. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "5040000000.00",
+      "expectedImpactPct": "10.080000",
+      "expectedAlert": "HIGH"
+    },
+    {
+      "key": "scenario-4",
+      "name": "September Threshold comparison v1",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "50",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Threshold comparison v1. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4200000000.00",
+      "expectedImpactPct": "8.400000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-5",
+      "name": "September Threshold comparison v2",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "50",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v2",
+      "rationale": "Synthetic full-demo analysis: September Threshold comparison v2. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4200000000.00",
+      "expectedImpactPct": "8.400000",
+      "expectedAlert": "HIGH"
+    },
+    {
+      "key": "scenario-6",
+      "name": "August Severe",
+      "reportingDate": "2026-08-31",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "30",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: August Severe. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "4620000000.00",
+      "expectedImpactPct": "9.240000",
+      "expectedAlert": "MEDIUM"
+    },
+    {
+      "key": "scenario-7",
+      "name": "September Higher recovery",
+      "reportingDate": "2026-09-30",
+      "nbfcId": "SYN-NBFC-001",
+      "severityPct": "60",
+      "recoveryPct": "50",
+      "thresholdKey": "demo-v1",
+      "rationale": "Synthetic full-demo analysis: September Higher recovery. Explicit EAD and matching-date capital/asset-quality inputs.",
+      "expectedLoss": "3600000000.00",
+      "expectedImpactPct": "7.200000",
+      "expectedAlert": "MEDIUM"
+    }
+  ],
+  "notes": [
+    "September portfolio EAD INR 3000 crore; NBFC 001 EAD INR 1200 crore; largest share 40%; top-three share 73.33%.",
+    "NPA 001: July 12%, August 10%, September 7%. NPA 002: 3%, 5%, 8%.",
+    "August to September: NBFC 001 increases INR 100 crore; NBFC 002 reduces INR 50 crore; NBFC 008 is newly listed; NBFC 007 is absent.",
+    "Primary comparison: select Baseline scenario-1, Moderate scenario-2 and Severe scenario-3, all September/v1.",
+    "Threshold-only comparison: scenario-4 MEDIUM vs scenario-5 HIGH; identical loss and capital impact."
+  ]
+}

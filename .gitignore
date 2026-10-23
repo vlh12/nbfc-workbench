@@ -7,3 +7,17 @@ target/
 
 
 .metadata/
+.vscode/local.env
+samples/full-demo/import-state.json
+.local-run/
+
+# Private settings and generated local files
+.env.*
+!.env.example
+.vscode/*.env
+*.tsbuildinfo
+*.zip
+*.p12
+*.pfx
+*.key
+**/import-state.json

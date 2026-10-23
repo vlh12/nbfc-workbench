@@ -1,5 +1,7 @@
 # Requirements and verification status
 
+> Current portfolio workflow (18 October 2026): see [Phase 0 implementation](phase0-implementation.md) for the 19/20-column upload, all-service startup, analytics, stress/review APIs, and outstanding verification limits. The older descriptions below cover the earlier upload/report slice and are superseded where the new guide differs.
+
 The approved stack is React 19, TypeScript, Vite, Tailwind, Recharts, Java 21, Spring Boot, Spring Cloud Gateway MVC, Kafka, Oracle Database and JPA/Flyway. The project is organized as Access & Data, Exposure Analytics, Stress Simulation and Risk Governance, with logical data ownership between services.
 
 ## Implemented
@@ -40,3 +42,8 @@ The Phase 0 proposal, client Q&A and agreed workflow documents were not availabl
 - Frontend TypeScript compilation and Vite production build pass.
 - Oracle migration execution, Kafka startup and end-to-end browser execution still require local verification.
 
+
+
+## User-requested reviewed workflow, 22 October 2026
+
+The current user explicitly requested initial Supervisor confirmation of contributor data before analyst calculations. This supersedes automatic approval of warning-free new contributor inputs. Contributor save creates PENDING_REVIEW; authorized Supervisor approval/return is recorded separately, with analyst access blocked until approval. Final scenario assessment approval remains separate and is required for PDF export. Details and verification: [workflow handover](workflow-reset-and-handover.md).
