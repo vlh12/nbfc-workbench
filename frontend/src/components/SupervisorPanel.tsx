@@ -1,3 +1,4 @@
+import { SuccessToast } from "./SuccessToast";
 import { DecisionSummary } from "./DecisionSummary";
 import { scenarioName } from "../workflowLabels";
 import { GovernanceIndicators } from "./GovernanceIndicators";
@@ -26,7 +27,7 @@ export function SupervisorPanel(){
  const current=assessments.find(a=>a.id===selected);
  return <section className="space-y-5 rounded-xl border border-violet-200 bg-white p-6" aria-labelledby="supervisor-review-heading">
   <div><p className="text-xs font-bold uppercase tracking-widest text-violet-800">Risk governance</p><h2 id="supervisor-review-heading" className="mt-1 text-xl font-bold">2. Review analyst scenarios & follow-up</h2><p className="mt-1 text-sm text-slate-600">Review analyst assessments, record an approval decision and track follow-up actions.</p></div>
-  {error&&<p role="alert" className="rounded-lg bg-red-50 p-3 text-red-900">{error}</p>}{notice&&<p role="status" className="rounded-lg bg-violet-50 p-3 text-violet-900">{notice}</p>}
+  {error&&<p role="alert" className="rounded-lg bg-red-50 p-3 text-red-900">{error}</p>}<SuccessToast message={notice} onDismiss={() => setNotice("")} />
   <GovernanceIndicators assessments={assessments} followUps={followUps} loaded={loaded} error={dataError} />
   <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
    <div><h3 className="font-semibold">Assessments</h3><div className="mt-3 space-y-2">{assessments.length===0&&<p className="text-sm text-slate-500">No analyst assessments have been submitted.</p>}{assessments.map(a=><button key={a.id} onClick={()=>setSelected(a.id)} className={"block w-full rounded-lg border p-3 text-left "+(selected===a.id?"border-violet-700 bg-violet-50":"border-slate-200 hover:bg-slate-50")}><div className="flex items-center justify-between gap-2"><span className="font-mono text-xs">{assessmentName(a)}</span><span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold">{a.status}</span></div><details className="mt-2 text-xs"><summary>Technical references</summary><p>Assessment {a.id} · Portfolio {a.batchId}</p></details><p className="text-xs text-slate-500">Submitted by Analyst · {new Date(a.submittedAt).toLocaleString("en-IN")}</p>{a.submissionNote&&<p className="mt-2 text-sm text-slate-700">{a.submissionNote}</p>}</button>)}</div></div>

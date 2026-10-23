@@ -1,3 +1,4 @@
+import { SuccessToast } from "./SuccessToast";
 import { useEffect, useState } from "react";
 import { api } from "../auth";
 import { entryLabel } from "../workflowLabels";
@@ -22,7 +23,7 @@ export function DataReviewPanel({entries,onChanged}:{entries:Entry[];onChanged:(
   <p>Check the portfolio, matching bank capital and NBFC asset-quality buckets before approving them for the analyst. This is separate from approving the final scenario.</p>
   <p>{rows.filter(e=>e.status==="PENDING_REVIEW").length} inputs awaiting review</p>
   <label>Data to review<select className="mt-1 w-full rounded border p-3" aria-label="Data to review" value={selected} onChange={e=>{setSelected(e.target.value);setNotice("")}}><option value="">Select a named input</option>{rows.map(e=><option key={e.id} value={e.id}>{entryLabel(e)}</option>)}</select></label>
-  {error&&<p role="alert" className="rounded bg-red-50 p-3">{error}</p>}{notice&&<p role="status" className="rounded bg-teal-50 p-3">{notice}</p>}
+  {error&&<p role="alert" className="rounded bg-red-50 p-3">{error}</p>}<SuccessToast message={notice} onDismiss={() => setNotice("")} />
   {current&&detail&&<>
    <h3 className="font-bold">{current.name} · {current.status.replaceAll("_"," ")}</h3>
    <p>{detail.bankId} · {detail.reportingDate}{detail.nbfcId?" · "+detail.nbfcId:""}</p>

@@ -1,3 +1,4 @@
+import { SuccessToast } from "./SuccessToast";
 import { SubmissionStatus } from "./SubmissionStatus";
 import { DashboardOverview, ScenarioBrowser, ReportsPanel, UserGuide, AssessmentList } from "./RiskDashboard";
 import { DataReviewPanel } from "./DataReviewPanel";
@@ -101,6 +102,25 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     await perform(async () => { const data = new FormData(); data.set("file", file); data.set("synthetic", "true"); data.set("name", portfolioName.trim()); const s = await api<Snapshot>("/api/portfolios", { method: "POST", body: data }); setSelected(s.id); setReportingPeriod(s.reportingDate); setValidation(null); setFile(null); setPortfolioName(""); setContributorView("saved"); }, "Portfolio saved for Supervisor review. Add matching capital and asset quality. Analyst access begins after approval.");
   }
   const post = (path: string, data: unknown) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+  async function saveQuality(event: FormEvent) {
+    event.preventDefault();
+    await perform(async () => {
+      const amounts: Record<string, string> = {};
+      for (const field of [...buckets, "Total bucket amount"]) {
+        const value = (field === "Total bucket amount" ? qualityTotal : qualityAmounts[field] || "").trim();
+        if (!/^[0-9]{1,16}(\.[0-9]{1,2})?$/.test(value)) {
+          throw new Error(`${field}: enter a nonnegative INR amount using digits and at most two decimal places, without commas or symbols.`);
+        }
+        amounts[field] = value;
+      }
+      const sum = buckets.reduce((total, field) => total + cents(amounts[field]), 0n);
+      if (sum !== cents(amounts["Total bucket amount"])) {
+        throw new Error(`The seven buckets add up to ${rupees((sum / 100n).toString() + "." + (sum % 100n).toString().padStart(2, "0"))}. Enter that total or correct the bucket amounts against your source data.`);
+      }
+      const cleanBuckets = Object.fromEntries(buckets.map(field => [field, amounts[field]]));
+      await post("/api/portfolios/quality", { bankId: "SYN-BANK-001", nbfcId: qualityNbfc.trim(), reportingDate: date, buckets: cleanBuckets, totalAmount: amounts["Total bucket amount"] });
+    }, "Asset-quality version saved for Supervisor review.");
+  }
   async function saveThreshold(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
@@ -108,7 +128,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     setBusy(true); setThresholdError(""); setSavedThreshold(null); setNotice("");
     try {
       const saved = await api<Entry>("/api/portfolios/thresholds", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values) });
-      setSavedThreshold({ id: saved.id, name: values.name, mediumPct: values.mediumPct, highPct: values.highPct });
+      setSavedThreshold({ id: saved.id, name: values.name, mediumPct: values.mediumPct, highPct: values.highPct }); setNotice("Threshold version saved successfully.");
       await refresh();
     } catch (e) { setThresholdError(errorMessage(e)); }
     finally { setBusy(false); }
@@ -160,7 +180,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
     </div>
     {supervisor && show("assessments","data") && <DataReviewPanel entries={entries} onChanged={()=>{void refresh();setRefreshTick(t=>t+1)}} />}
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-900">{error}</p>}
-    {notice && <p role="status" className="rounded bg-teal-50 p-3 text-teal-900">{notice}</p>}
+    <SuccessToast message={notice} onDismiss={() => setNotice("")} />
     <div hidden={!show("data")} className="tool-section">
     {contributor && <div hidden={contributorView!=="upload"}>
       <ContributorUpload portfolioName={portfolioName} onPortfolioName={setPortfolioName} file={file} synthetic={synthetic} busy={busy} validation={validation}
@@ -210,7 +230,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
         <label className="mt-3 block">Capital definition / denominator label<input className={input} required maxLength={200} value={capitalLabel} onChange={e => setCapitalLabel(e.target.value)} /></label>
         <Button className="mt-3" disabled={busy}>Save capital version</Button>
       </form>
-      <form hidden={supportView!=="quality"} className={box+" max-w-2xl"} onSubmit={e => { e.preventDefault(); void perform(() => post("/api/portfolios/quality", { bankId: "SYN-BANK-001", nbfcId: qualityNbfc, reportingDate: date, buckets: qualityAmounts, totalAmount: qualityTotal }), "Asset-quality version saved."); }}>
+      <form hidden={supportView!=="quality"} className={box+" max-w-2xl"} onSubmit={e => void saveQuality(e)}>
         <h3 className="font-bold">NBFC asset quality</h3><p className="mt-2 text-xs">Enter mutually exclusive synthetic buckets in INR rupees. Do not infer these from the bank loan CSV.</p>
         <label className="mt-3 block">NBFC ID<input className={input} required value={qualityNbfc} onChange={e => setQualityNbfc(e.target.value)} /></label>
         <label className="mt-3 block">Reporting date<input className={input} type="date" required value={date} onChange={e => setDate(e.target.value)} /></label>
@@ -228,7 +248,7 @@ export function PortfolioWorkbench({ view = "all", navigate = () => {} }: { view
         <Button disabled={busy}>Save threshold version</Button>
       </fieldset>
       {thresholdError && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-900">Threshold version was not saved: {thresholdError}</p>}
-      {savedThreshold && <div role="status" className="mt-4 rounded-lg border border-teal-200 bg-teal-50 p-4 text-sm text-teal-950">
+      {savedThreshold && <div className="mt-4 rounded-lg border border-teal-200 bg-teal-50 p-4 text-sm text-teal-950">
         <p className="font-semibold">Threshold version saved successfully</p>
         <p className="mt-2 break-words">Last saved: <strong>{savedThreshold.name}</strong></p>
         <p className="mt-1 break-all text-xs">Version ID: {savedThreshold.id}</p>
