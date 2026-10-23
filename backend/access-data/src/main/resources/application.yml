@@ -76,5 +76,9 @@ springdoc:
     persist-authorization: false
 
 workbench:
+  bootstrap:
+    enabled: ${WORKBENCH_BOOTSTRAP_ENABLED:false}
+    username: ${WORKBENCH_BOOTSTRAP_USERNAME:supervisor}
+    password: ${WORKBENCH_BOOTSTRAP_PASSWORD}
   openapi:
     title: Access & Data API
